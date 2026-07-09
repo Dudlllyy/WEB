@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monochrome Glass Portfolio</title>
+    <style>
+        /* Общие сбросы */
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+
+        body {
+            background-color: #0a0b10;
+            background: radial-gradient(circle at top right, #1f2029 0%, #13141c 50%, #0a0b10 100%);
+            color: #ffffff; min-height: 100vh; overflow-x: hidden; overflow-y: auto;
+            display: flex; flex-direction: column; position: relative;
+        }
+
+        /* Скроллбар */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.2); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.4); }
+
+        /* --- СЛОИ ТЕМЫ --- */
+        .theme-layer {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -3;
+            opacity: 0; transition: opacity 2.5s cubic-bezier(0.25, 1, 0.5, 1); pointer-events: none; will-change: opacity;
+        }
+        #theme-intel { background: radial-gradient(circle at top right, #091a38 0%, #060b17 50%, #02040a 100%); }
+        #theme-ryzen { background: radial-gradient(circle at top right, #380909 0%, #170606 50%, #0a0202 100%); }
+        .theme-layer.active-theme { opacity: 1; }
+
+        /* --- ФОН И ПЫЛИНКИ --- */
+        .ambient-background {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; overflow: hidden;
+            z-index: -2; filter: blur(100px); -webkit-filter: blur(100px); will-change: transform; transform: translateZ(0);
+        }
+        .blob { position: absolute; border-radius: 50%; animation: float 25s infinite ease-in-out alternate; background: rgba(255, 255, 255, 0.05); will-change: transform; }
+        .blob-1 { width: 50vw; height: 50vw; top: -10%; left: -10%; animation-duration: 30s; }
+        .blob-2 { width: 45vw; height: 45vw; bottom: -20%; right: -10%; animation-duration: 35s; animation-delay: -5s; }
+        .blob-3 { width: 40vw; height: 40vw; top: 20%; left: 30%; animation-duration: 28s; animation-delay: -10s; }
+        @keyframes float { 0% { transform: translate3d(0, 0, 0) scale(1); } 50% { transform: translate3d(3vw, 5vh, 0) scale(1.05); } 100% { transform: translate3d(-5vw, -8vh, 0) scale(0.95); } }
+
+        #particles-container { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1; pointer-events: none; overflow: hidden; }
+        .particle { position: absolute; background: rgba(255, 255, 255, 0.8); border-radius: 50%; will-change: transform, opacity; }
+        @keyframes drift { 0% { transform: translate3d(0, 0, 0); opacity: 0; } 20% { opacity: 0.3; } 80% { opacity: 0.3; } 100% { transform: translate3d(5vw, -20vh, 0); opacity: 0; } }
+
+        /* ОБЩИЙ КЛАСС СТЕКЛА */
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.02); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
+            border-radius: 30px; border: 1px solid rgba(255, 255, 255, 0.05);
+            border-top: 1px solid rgba(255, 255, 255, 0.2); border-left: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5), inset 0 0 20px rgba(255, 255, 255, 0.02);
+            will-change: transform;
+        }
+
+        /* Навигация */
+        .navbar { display: flex; justify-content: center; padding: 20px 0; z-index: 100; position: fixed; width: 100%; }
+        .navbar-menu { display: flex; gap: 30px; padding: 15px 40px; border-radius: 30px; }
+        .navbar-menu a { text-decoration: none; color: rgba(255, 255, 255, 0.6); font-size: 13px; font-weight: 600; letter-spacing: 1px; transition: color 0.3s; }
+        .navbar-menu a:hover { color: #ffffff; }
+
+        /* ================= СЕКЦИЯ 1: КАРУСЕЛЬ ================= */
+        .main-container { display: flex; min-height: 100vh; padding: 100px 80px 40px; gap: 60px; align-items: center; }
+        .text-section { flex: 1; padding: 60px; max-width: 650px; position: relative; }
+        .text-section h1 { font-size: 3rem; line-height: 1.2; margin-bottom: 25px; font-weight: bold; transition: opacity 0.3s ease; }
+        .text-section p { font-size: 1.1rem; line-height: 1.6; color: rgba(255, 255, 255, 0.6); transition: opacity 0.3s ease; }
+
+        .carousel-section { flex: 1; height: 500px; position: relative; perspective: 1200px; display: flex; justify-content: center; align-items: center; cursor: grab; user-select: none; }
+        .card {
+            --drag-x: 0px; --drag-deg: 0deg; position: absolute; width: 280px; height: 380px;
+            transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.6s, filter 0.6s, box-shadow 0.6s;
+            cursor: grab; border-radius: 30px; box-shadow: 0 30px 60px rgba(0, 0, 0, 0.6);
+            animation: cardLevitate 1s ease-in-out infinite alternate; will-change: transform, translate, filter, opacity;
+        }
+        .card:nth-child(1) { animation-delay: 0s; } .card:nth-child(2) { animation-delay: -1.3s; } .card:nth-child(3) { animation-delay: -2.6s; }
+        @keyframes cardLevitate { 0% { translate: 0 15px; } 100% { translate: 0 -15px; } }
+        .card-img { width: 100%; height: 100%; object-fit: cover; border-radius: 30px; position: absolute; top: 0; left: 0; z-index: 1; pointer-events: none; }
+        .glass-overlay {
+            position: absolute; inset: 0; z-index: 2; border-radius: 30px; pointer-events: none;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0.02) 40%, rgba(255, 255, 255, 0) 60%, rgba(255, 255, 255, 0.05) 100%);
+            border: 1px solid rgba(255, 255, 255, 0.05); border-top: 2px solid rgba(255, 255, 255, 0.5); border-left: 2px solid rgba(255, 255, 255, 0.3); border-bottom: 1px solid rgba(0, 0, 0, 0.4); border-right: 1px solid rgba(0, 0, 0, 0.4);
+            box-shadow: inset 2px 2px 10px rgba(255, 255, 255, 0.2), inset -5px -5px 20px rgba(0, 0, 0, 0.6);
+        }
+        .card.prev { transform: translateX(calc(-170px + var(--drag-x))) translateZ(-150px) rotateY(calc(30deg + var(--drag-deg))); z-index: 1; opacity: 0.5; filter: brightness(0.1); }
+        .card.active { transform: translateX(calc(0px + var(--drag-x))) translateZ(80px) rotateY(var(--drag-deg)); z-index: 3; opacity: 1; filter: brightness(1); box-shadow: 0 40px 80px rgba(0, 0, 0, 0.8), inset 0 0 30px rgba(255, 255, 255, 0.05); }
+        .card.next { transform: translateX(calc(170px + var(--drag-x))) translateZ(-150px) rotateY(calc(-30deg + var(--drag-deg))); z-index: 1; opacity: 0.5; filter: brightness(0.1); }
+        .card.hidden { transform: translateX(calc(0px + var(--drag-x))) translateZ(-300px) scale(0.5); opacity: 0; z-index: 0; pointer-events: none; }
+        .no-transition { transition: none !important; }
+
+        /* ================= УНИВЕРСАЛЬНЫЕ КОМПОНЕНТЫ ================= */
+        .content-section { display: flex; min-height: 100vh; padding: 80px; gap: 60px; align-items: center; position: relative; }
+        .info-stack { flex: 1; position: relative; height: 400px; max-width: 550px; perspective: 1000px; transform-style: preserve-3d; }
+        .info-card {
+            position: absolute; width: 100%; height: 100%; padding: 50px; display: flex; flex-direction: column; justify-content: center;
+            transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.6s ease, filter 0.6s ease; will-change: transform, opacity, filter;
+        }
+        .info-card h2 { font-size: 2.5rem; margin-bottom: 20px; }
+        .info-card p { font-size: 1.1rem; line-height: 1.6; color: rgba(255, 255, 255, 0.6); margin-bottom: 20px;}
+        .info-card .price { font-size: 2rem; font-weight: bold; color: #fff; margin-top: auto;}
+
+        .visual-container { flex: 1; position: relative; height: 600px; display: flex; justify-content: center; align-items: center; }
+        .moon {
+            position: absolute; width: 420px; height: 420px; border-radius: 50%; z-index: 1; top: 50%; left: 50%; transform: translate(-50%, -40%); opacity: 0.6; pointer-events: none;
+            background: radial-gradient(circle at 40% 40%, rgba(255, 255, 255, 0.7) 0%, rgba(255, 255, 255, 0.1) 50%, transparent 70%);
+            filter: blur(40px); -webkit-filter: blur(40px); box-shadow: 0 0 150px rgba(255, 255, 255, 0.1);
+        }
+        .slider-controls { position: relative; z-index: 2; width: 100%; display: flex; align-items: center; justify-content: space-between; }
+        .slider-btn {
+            background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.2); color: white; font-size: 2rem; width: 60px; height: 60px; border-radius: 50%;
+            cursor: pointer; backdrop-filter: blur(10px); transition: all 0.3s; display: flex; justify-content: center; align-items: center; z-index: 3;
+        }
+        .slider-btn:hover { background: rgba(255, 255, 255, 0.15); transform: scale(1.1); }
+        .item-image-wrapper { flex: 1; display: flex; justify-content: center; align-items: center; height: 400px; animation: gpuLevitate 1s ease-in-out infinite alternate; will-change: transform; }
+        .item-image { max-width: 100%; max-height: 100%; object-fit: contain; filter: drop-shadow(0 30px 40px rgba(0, 0, 0, 0.8)); transition: opacity 0.4s ease, transform 0.4s ease; transform: translateZ(0); will-change: opacity, transform; }
+        @keyframes gpuLevitate { 0% { transform: translate3d(0, 15px, 0); } 100% { transform: translate3d(0, -15px, 0); } }
+
+        /* ================= СЕКЦИЯ 2: GPU ================= */
+        .gpu-card.active-card { transform: translate3d(0, 0, 0) scale(1); z-index: 3; opacity: 1; }
+        .gpu-card.bg1-card { transform: translate3d(30px, -40px, -80px) scale(0.95); z-index: 2; opacity: 0.5; filter: brightness(0.1); }
+        .gpu-card.bg2-card { transform: translate3d(60px, -80px, -160px) scale(0.9); z-index: 1; opacity: 0.2; filter: brightness(0.1); }
+
+        /* ================= СЕКЦИЯ 3: CPU ================= */
+        .cpu-card { opacity: 0; transform: translateY(30px) scale(0.95); pointer-events: none; z-index: 1; transition: transform 0.6s ease, opacity 0.6s ease; }
+        .cpu-card.active-card { opacity: 1; transform: translateY(0) scale(1); pointer-events: all; z-index: 3; }
+
+        /* ================= СЕКЦИЯ 4: RAM ================= */
+        .ram-section { display: flex; flex-direction: column; min-height: 100vh; padding: 100px 80px; position: relative; }
+        .ram-title { font-size: 3rem; margin-bottom: 40px; text-align: center; font-weight: bold; }
+
+        .filter-container { display: flex; flex-direction: column; gap: 20px; align-items: center; margin-bottom: 40px; }
+        .filter-row { display: flex; gap: 20px; transition: opacity 0.4s ease, transform 0.4s ease; }
+        .filter-row.hidden-row { opacity: 0; pointer-events: none; transform: translateY(-20px); height: 0; overflow: hidden; margin: 0; }
+
+        .filter-btn {
+            padding: 12px 30px; font-size: 1.2rem; font-weight: bold; color: rgba(255, 255, 255, 0.6);
+            background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 20px;
+            cursor: pointer; backdrop-filter: blur(10px); transition: all 0.3s ease;
+        }
+        .filter-btn:hover { background: rgba(255, 255, 255, 0.1); color: #fff; }
+        .filter-btn.active-btn { background: rgba(255, 255, 255, 0.15); color: #fff; border-color: rgba(255, 255, 255, 0.6); box-shadow: 0 0 20px rgba(255, 255, 255, 0.1); }
+
+        .ram-results { width: 100%; display: flex; flex-direction: column; gap: 40px; transition: opacity 0.6s ease; }
+        .ram-results.hidden-results { opacity: 0; pointer-events: none; }
+
+        /* ИСПРАВЛЕНИЕ 1: Идеальное совпадение (Увеличили размеры) */
+        .perfect-match-board { padding: 40px; min-height: 350px; display: flex; flex-direction: column; align-items: center; position: relative; }
+        .board-title { font-size: 1.5rem; margin-bottom: 30px; color: rgba(255, 255, 255, 0.8); }
+        .perfect-grid { display: flex; gap: 50px; justify-content: center; align-items: center; width: 100%; }
+
+        .ram-stick-wrapper {
+            width: 180px; /* Было 120px */
+            height: 260px; /* Было 180px */
+            display: flex; justify-content: center; align-items: center;
+            animation: gpuLevitate 1s ease-in-out infinite alternate; cursor: pointer;
+        }
+        .ram-stick-wrapper:nth-child(2) { animation-delay: -1s; }
+        .ram-stick-wrapper:nth-child(3) { animation-delay: -2s; }
+        .ram-stick-img {
+            width: 100%; height: 100%; object-fit: contain; /* Заставит картинку вписаться в блок без искажений */
+            filter: drop-shadow(0 20px 30px rgba(0, 0, 0, 0.7));
+            transform: translateZ(0); will-change: transform; transition: transform 0.3s;
+        }
+        .ram-stick-wrapper:hover .ram-stick-img { transform: scale(1.1) translateZ(0); }
+
+        /* ИСПРАВЛЕНИЕ 2: Частичное совпадение (Жестко ограничили размер картинки) */
+        .partial-match-board { padding: 30px; }
+        .partial-slider {
+            display: flex; gap: 20px; overflow-x: auto; padding-bottom: 20px; cursor: grab; scrollbar-width: none;
+        }
+        .partial-slider::-webkit-scrollbar { display: none; }
+        .partial-slider:active { cursor: grabbing; }
+
+        .partial-card {
+            min-width: 160px; height: 120px; display: flex; justify-content: center; align-items: center;
+            background: rgba(255, 255, 255, 0.01); border-radius: 20px; border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 15px; /* Добавили отступ, чтобы картинка не билась о края */
+            transition: background 0.3s; pointer-events: none;
+        }
+        .partial-card img {
+            width: 100%; height: 100%; /* Картинка теперь не сможет превысить размеры карточки */
+            object-fit: contain;
+            filter: drop-shadow(0 10px 15px rgba(0, 0, 0, 0.5));
+        }
+
+        /* ТУЛТИП */
+        .custom-tooltip {
+            position: fixed; top: 0; left: 0; width: 220px; padding: 20px; z-index: 9999;
+            pointer-events: none; opacity: 0; transition: opacity 0.3s ease; will-change: transform, opacity;
+            background: rgba(10, 11, 16, 0.6); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+            border-radius: 15px; border: 1px solid rgba(255, 255, 255, 0.1); border-left: 2px solid rgba(255, 255, 255, 0.4); box-shadow: 0 20px 40px rgba(0, 0, 0, 0.8);
+        }
+        .custom-tooltip h4 { margin-bottom: 10px; font-size: 1.1rem; color: #fff; }
+        .custom-tooltip p { font-size: 0.9rem; color: rgba(255, 255, 255, 0.7); line-height: 1.4; }
+
+    </style>
+</head>
+<body>
+
+    <div id="theme-intel" class="theme-layer"></div>
+    <div id="theme-ryzen" class="theme-layer"></div>
+
+    <div class="ambient-background">
+        <div class="blob blob-1"></div><div class="blob blob-2"></div><div class="blob blob-3"></div>
+    </div>
+    <div id="particles-container"></div>
+
+    <header class="navbar">
+        <nav class="navbar-menu glass-effect">
+            <a href="#">ГЛАВНОЕ</a><a href="#">КАТАЛОГ</a><a href="#">ЦЕНЫ</a><a href="#">БЛОГ</a><a href="#">КОНТАКТЫ</a><a href="#">КАБИНЕТ</a>
+        </nav>
+    </header>
+
+    <main class="main-container">
+        <section class="text-section glass-effect">
+            <h1>УНИКАЛЬНЫЙ<br>ОБЪЕКТ:<br>ОПИСАНИЕ</h1>
+            <p>Здесь подробное объяснение. Монохромный дизайн позволяет сосредоточить все внимание на контенте, а прозрачное стекло придает легкости.</p>
+        </section>
+        <section class="carousel-section" id="carousel">
+            <div class="card" data-title="ПРОЕКТ АЛЬФА" data-desc="Описание первого визуального проекта.">
+                <img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2564&auto=format&fit=crop" class="card-img" draggable="false">
+                <div class="glass-overlay"></div>
+            </div>
+            <div class="card" data-title="ПРОЕКТ БЕТА" data-desc="Убрали лишние цвета, оставив только свет и тени.">
+                <img src="https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=2670&auto=format&fit=crop" class="card-img" draggable="false">
+                <div class="glass-overlay"></div>
+            </div>
+            <div class="card" data-title="ПРОЕКТ ГАММА" data-desc="Мелкие пылинки на фоне создают эффект реального пространства.">
+                <img src="https://images.unsplash.com/photo-1614850523459-c2f4c699c52e?q=80&w=2670&auto=format&fit=crop" class="card-img" draggable="false">
+                <div class="glass-overlay"></div>
+            </div>
+        </section>
+    </main>
+
+    <section class="content-section">
+        <div class="info-stack">
+            <div class="info-card gpu-card glass-effect active-card">
+                <h2>Видеокарта 1</h2><p>Флагманская модель с невероятной производительностью.</p><div class="price">$1,499</div>
+            </div>
+            <div class="info-card gpu-card glass-effect bg1-card">
+                <h2>Видеокарта 2</h2><p>Идеальный баланс цены и качества.</p><div class="price">$899</div>
+            </div>
+            <div class="info-card gpu-card glass-effect bg2-card">
+                <h2>Видеокарта 3</h2><p>Бюджетное решение для базовых задач.</p><div class="price">$399</div>
+            </div>
+        </div>
+        <div class="visual-container">
+            <div class="moon"></div>
+            <div class="slider-controls">
+                <button class="slider-btn" onclick="prevGpu()">&lt;</button>
+                <div class="item-image-wrapper"><img src="" class="item-image" id="gpu-img" draggable="false"></div>
+                <button class="slider-btn" onclick="nextGpu()">&gt;</button>
+            </div>
+        </div>
+    </section>
+
+    <section class="content-section" id="cpu-section">
+        <div class="info-stack">
+            <div class="info-card cpu-card glass-effect active-card" data-brand="intel">
+                <h2>Intel Core i9</h2><p>Максимальная тактовая частота и превосходная работа.</p><div class="price">$599</div>
+            </div>
+            <div class="info-card cpu-card glass-effect" data-brand="ryzen">
+                <h2>AMD Ryzen 9</h2><p>Многопоточный монстр для рендера и гейминга.</p><div class="price">$549</div>
+            </div>
+        </div>
+        <div class="visual-container">
+            <div class="moon"></div>
+            <div class="slider-controls">
+                <button class="slider-btn" onclick="prevCpu()">&lt;</button>
+                <div class="item-image-wrapper"><img src="" class="item-image" id="cpu-img" draggable="false"></div>
+                <button class="slider-btn" onclick="nextCpu()">&gt;</button>
+            </div>
+        </div>
+    </section>
+
+    <section class="ram-section">
+        <h2 class="ram-title">Оперативная память RAM</h2>
+
+        <div class="filter-container">
+            <div class="filter-row" id="ram-type-row">
+                <button class="filter-btn" data-type="DDR3">DDR3</button>
+                <button class="filter-btn" data-type="DDR4">DDR4</button>
+                <button class="filter-btn" data-type="DDR5">DDR5</button>
+            </div>
+            <div class="filter-row hidden-row" id="ram-size-row">
+                <button class="filter-btn" data-size="8gb">8gb</button>
+                <button class="filter-btn" data-size="16gb">16gb</button>
+                <button class="filter-btn" data-size="32gb">32gb</button>
+                <button class="filter-btn" data-size="64gb">64gb</button>
+            </div>
+        </div>
+
+        <div class="ram-results hidden-results" id="ram-results-board">
+            <div class="perfect-match-board glass-effect">
+                <h3 class="board-title"></h3>
+                <div class="perfect-grid" id="perfect-grid"></div>
+            </div>
+
+            <div class="partial-match-board glass-effect">
+                <h3 class="board-title" style="text-align: center;">Что-то похожее</h3>
+                <div class="partial-slider" id="partial-slider"></div>
+            </div>
+        </div>
+    </section>
+
+    <div class="custom-tooltip" id="custom-tooltip">
+        <h4 id="tt-title">Название</h4>
+        <p id="tt-desc">Описание</p>
+    </div>
+
+
+    <script>
+        // --- 1. ПЫЛИНКИ ---
+        const particlesContainer = document.getElementById('particles-container');
+        for (let i = 0; i < 40; i++) {
+            let p = document.createElement('div'); p.classList.add('particle');
+            p.style.width = p.style.height = `${Math.random() * 1.5 + 1}px`;
+            p.style.left = `${Math.random() * 100}vw`; p.style.top = `${Math.random() * 100}vh`;
+            p.style.animation = `drift ${Math.random() * 20 + 15}s linear ${Math.random() * 10}s infinite`;
+            particlesContainer.appendChild(p);
+        }
+
+        // --- 2. КАРУСЕЛИ ВЕРХНЯЯ ---
+        const cards = Array.from(document.querySelectorAll('.card'));
+        const carousel = document.querySelector('.carousel-section');
+        const titleEl = document.querySelector('.text-section h1');
+        const descEl = document.querySelector('.text-section p');
+        let isAnim = false, isDrag = false, startX = 0, dragX = 0, activeC = null;
+
+        function updateCards() {
+            cards.forEach((c, i) => {
+                c.className = 'card';
+                if (i === 0) c.classList.add('prev'); else if (i === 1) c.classList.add('active'); else if (i === 2) c.classList.add('next'); else c.classList.add('hidden');
+                c.style.setProperty('--drag-x', '0px'); c.style.setProperty('--drag-deg', '0deg');
+            });
+            const cAct = cards[1]; if (!cAct) return;
+            titleEl.style.opacity = 0; descEl.style.opacity = 0;
+            setTimeout(() => { titleEl.innerHTML = cAct.getAttribute('data-title') || ""; descEl.innerHTML = cAct.getAttribute('data-desc') || ""; titleEl.style.opacity = 1; descEl.style.opacity = 1; }, 300);
+        }
+        function moveR() { if (isAnim) return; isAnim = true; cards.push(cards.shift()); updateCards(); setTimeout(() => isAnim = false, 600); }
+        function moveL() { if (isAnim) return; isAnim = true; cards.unshift(cards.pop()); updateCards(); setTimeout(() => isAnim = false, 600); }
+        function dragStart(e) { if (isAnim) return; activeC = cards.find(c => c.classList.contains('active')); if (!activeC) return; isDrag = true; carousel.style.cursor = 'grabbing'; startX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX; activeC.classList.add('no-transition'); }
+        function dragMove(e) { if (!isDrag || !activeC) return; dragX = (e.type.includes('mouse') ? e.clientX : e.touches[0].clientX) - startX; activeC.style.setProperty('--drag-x', `${dragX}px`); activeC.style.setProperty('--drag-deg', `${dragX * 0.10}deg`); }
+        function dragEnd() { if (!isDrag || !activeC) return; isDrag = false; carousel.style.cursor = 'grab'; activeC.classList.remove('no-transition'); if (dragX > 120) moveL(); else if (dragX < -120) moveR(); else updateCards(); dragX = 0; activeC = null; }
+        carousel.addEventListener('mousedown', dragStart); window.addEventListener('mousemove', dragMove); window.addEventListener('mouseup', dragEnd);
+        carousel.addEventListener('touchstart', dragStart, {passive: true}); window.addEventListener('touchmove', dragMove, {passive: true}); window.addEventListener('touchend', dragEnd);
+        updateCards();
+
+        // --- 3. GPU СЛАЙДЕР ---
+        const gpuCards = Array.from(document.querySelectorAll('.gpu-card'));
+        const gpuImg = document.getElementById('gpu-img');
+        const gpuList = ['GPU_1.png', 'GPU_2.png', 'GPU_3.png'];
+        let gpuIdx = 0, gpuTimer = null;
+        if(gpuList[0] !== 'GPU.png') gpuImg.src = gpuList[gpuIdx];
+
+        function updateGpu() { gpuCards.forEach((c, i) => { c.classList.remove('active-card', 'bg1-card', 'bg2-card'); if (i === 0) c.classList.add('active-card'); else if (i === 1) c.classList.add('bg1-card'); else if (i === 2) c.classList.add('bg2-card'); }); }
+        function changeGpuImg() { gpuImg.style.opacity = 0; gpuImg.style.transform = 'translate3d(0, 20px, 0) scale(0.95)'; setTimeout(() => { if(gpuList[gpuIdx] !== 'ССЫЛКА_GPU_1.png') gpuImg.src = gpuList[gpuIdx]; gpuImg.style.opacity = 1; gpuImg.style.transform = 'translate3d(0, 0, 0) scale(1)'; }, 400); }
+        function nextGpu() { gpuCards.push(gpuCards.shift()); gpuIdx = (gpuIdx + 1) % gpuList.length; updateGpu(); changeGpuImg(); resetGpuTimer(); }
+        function prevGpu() { gpuCards.unshift(gpuCards.pop()); gpuIdx = (gpuIdx - 1 + gpuList.length) % gpuList.length; updateGpu(); changeGpuImg(); resetGpuTimer(); }
+        function startGpuTimer() { gpuTimer = setInterval(nextGpu, 60000); }
+        function resetGpuTimer() { clearInterval(gpuTimer); startGpuTimer(); }
+        startGpuTimer();
+
+        // --- 4. CPU СЛАЙДЕР ---
+        const cpuCards = Array.from(document.querySelectorAll('.cpu-card'));
+        const cpuImg = document.getElementById('cpu-img');
+        const themeIntel = document.getElementById('theme-intel');
+        const themeRyzen = document.getElementById('theme-ryzen');
+        const cpuList = ['CPU_1.png', 'CPU_2.png'];
+        let cpuIdx = 0, cpuTimer = null;
+        if(cpuList[0] !== 'CPU.png') cpuImg.src = cpuList[cpuIdx];
+
+        function updateCpu() { cpuCards.forEach((c, i) => { c.classList.remove('active-card'); if (i === cpuIdx) c.classList.add('active-card'); }); checkTheme(); }
+        function changeCpuImg() { cpuImg.style.opacity = 0; cpuImg.style.transform = 'translate3d(0, 20px, 0) scale(0.95)'; setTimeout(() => { if(cpuList[cpuIdx] !== 'ССЫЛКА_INTEL.png') cpuImg.src = cpuList[cpuIdx]; cpuImg.style.opacity = 1; cpuImg.style.transform = 'translate3d(0, 0, 0) scale(1)'; }, 400); }
+        function nextCpu() { cpuIdx = (cpuIdx === 0) ? 1 : 0; updateCpu(); changeCpuImg(); resetCpuTimer(); }
+        function prevCpu() { cpuIdx = (cpuIdx === 0) ? 1 : 0; updateCpu(); changeCpuImg(); resetCpuTimer(); }
+        function startCpuTimer() { cpuTimer = setInterval(nextCpu, 60000); }
+        function resetCpuTimer() { clearInterval(cpuTimer); startCpuTimer(); }
+        startCpuTimer();
+
+        // --- 5. OBSERVER (ЦВЕТ ФОНА) ---
+        let isCpuVisible = false;
+        const cpuSection = document.getElementById('cpu-section');
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) { isCpuVisible = true; checkTheme(); }
+                else { isCpuVisible = false; themeIntel.classList.remove('active-theme'); themeRyzen.classList.remove('active-theme'); }
+            });
+        }, { threshold: 0.4 });
+        observer.observe(cpuSection);
+
+        function checkTheme() {
+            if (!isCpuVisible) return;
+            themeIntel.classList.remove('active-theme'); themeRyzen.classList.remove('active-theme');
+            const currentBrand = cpuCards[cpuIdx].getAttribute('data-brand');
+            if (currentBrand === 'intel') themeIntel.classList.add('active-theme');
+            else if (currentBrand === 'ryzen') themeRyzen.classList.add('active-theme');
+        }
+
+        // --- 6. ЛОГИКА RAM ---
+        let selectedRamType = null;
+        let selectedRamSize = null;
+
+        const typeBtns = document.querySelectorAll('#ram-type-row .filter-btn');
+        const sizeRow = document.getElementById('ram-size-row');
+        const sizeBtns = document.querySelectorAll('#ram-size-row .filter-btn');
+        const ramResultsBoard = document.getElementById('ram-results-board');
+        const perfectGrid = document.getElementById('perfect-grid');
+        const partialSlider = document.getElementById('partial-slider');
+
+        const tooltip = document.getElementById('custom-tooltip');
+        const ttTitle = document.getElementById('tt-title');
+        const ttDesc = document.getElementById('tt-desc');
+        let isTooltipVisible = false;
+
+        document.addEventListener('mousemove', (e) => {
+            if(isTooltipVisible) {
+                tooltip.style.transform = `translate3d(${e.clientX + 20}px, ${e.clientY + 20}px, 0)`;
+            }
+        });
+
+        // ИСПРАВЛЕНИЕ 3: База данных с 5 разными ссылками на картинки
+        const ramImg1 = 'RAM.png';
+        const ramImg2 = 'RAM.png';
+        const ramImg3 = 'RAM.png';
+        const ramImg4 = 'RAM.png';
+        const ramImg5 = 'RAM.png';
+
+        const ramDatabase = [
+            { type: 'DDR4', size: '16gb', name: 'Fury Beast 16GB', desc: 'Отличная игровая память с радиатором.', img: ramImg1 },
+            { type: 'DDR4', size: '16gb', name: 'Corsair Vengeance', desc: 'Надежность и строгий дизайн для любых задач.', img: ramImg2 },
+            { type: 'DDR4', size: '16gb', name: 'G.Skill Ripjaws', desc: 'Высокие частоты и низкие тайминги.', img: ramImg3 },
+            { type: 'DDR4', size: '32gb', name: 'Fury Beast 32GB', desc: 'Для тяжелых задач и рендера.', img: ramImg4 },
+            { type: 'DDR5', size: '32gb', name: 'Dominator Platinum', desc: 'Премиальная память нового поколения.', img: ramImg5 },
+            { type: 'DDR3', size: '8gb',  name: 'HyperX Fury', desc: 'Классика для старых систем.', img: ramImg1 },
+            { type: 'DDR5', size: '64gb', name: 'G.Skill Trident Z5', desc: 'Ультимативная мощь для энтузиастов.', img: ramImg3 },
+            { type: 'DDR4', size: '8gb',  name: 'Crucial Ballistix', desc: 'Базовое решение для бюджетных сборок.', img: ramImg2 },
+        ];
+
+        typeBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                typeBtns.forEach(b => b.classList.remove('active-btn'));
+                btn.classList.add('active-btn');
+                selectedRamType = btn.getAttribute('data-type');
+                sizeRow.classList.remove('hidden-row');
+                if (selectedRamSize) renderRamResults();
+            });
+        });
+
+        sizeBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                sizeBtns.forEach(b => b.classList.remove('active-btn'));
+                btn.classList.add('active-btn');
+                selectedRamSize = btn.getAttribute('data-size');
+                ramResultsBoard.classList.remove('hidden-results');
+                renderRamResults();
+            });
+        });
+
+        function renderRamResults() {
+            perfectGrid.innerHTML = '';
+            partialSlider.innerHTML = '';
+
+            const perfectMatches = ramDatabase.filter(ram => ram.type === selectedRamType && ram.size === selectedRamSize);
+            const partialMatches = ramDatabase.filter(ram => (ram.type === selectedRamType || ram.size === selectedRamSize) && !(ram.type === selectedRamType && ram.size === selectedRamSize));
+
+            if (perfectMatches.length === 0) {
+                perfectGrid.innerHTML = '<p style="color: rgba(255,255,255,0.5);">Нет точных совпадений</p>';
+            }
+
+            perfectMatches.slice(0, 3).forEach(ram => {
+                const el = document.createElement('div');
+                el.className = 'ram-stick-wrapper';
+                el.innerHTML = `<img src="${ram.img}" class="ram-stick-img" draggable="false">`;
+
+                el.addEventListener('mouseenter', () => {
+                    ttTitle.textContent = ram.name;
+                    ttDesc.textContent = ram.desc;
+                    isTooltipVisible = true;
+                    tooltip.style.opacity = 1;
+                });
+                el.addEventListener('mouseleave', () => {
+                    isTooltipVisible = false;
+                    tooltip.style.opacity = 0;
+                });
+
+                perfectGrid.appendChild(el);
+            });
+
+            partialMatches.forEach(ram => {
+                const el = document.createElement('div');
+                el.className = 'partial-card';
+                el.innerHTML = `<img src="${ram.img}" draggable="false">`;
+                partialSlider.appendChild(el);
+            });
+
+            if(partialMatches.length === 0) {
+                partialSlider.innerHTML = '<p style="color: rgba(255,255,255,0.5);">Нет похожих вариантов</p>';
+            }
+        }
+
+        // --- ДРАГ-Н-ДРОП ДЛЯ НИЖНЕГО СЛАЙДЕРА RAM ---
+        let isDown = false;
+        let startPosX;
+        let scrollLeft;
+
+        partialSlider.addEventListener('mousedown', (e) => {
+            isDown = true;
+            startPosX = e.pageX - partialSlider.offsetLeft;
+            scrollLeft = partialSlider.scrollLeft;
+        });
+        partialSlider.addEventListener('mouseleave', () => isDown = false);
+        partialSlider.addEventListener('mouseup', () => isDown = false);
+        partialSlider.addEventListener('mousemove', (e) => {
+            if (!isDown) return;
+            e.preventDefault();
+            const x = e.pageX - partialSlider.offsetLeft;
+            const walk = (x - startPosX) * 2;
+            partialSlider.scrollLeft = scrollLeft - walk;
+        });
+
+    </script>
+</body>
+</html>
