@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Каталог - Monochrome Glass</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <div class="ambient-background">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+        <div class="blob blob-4"></div> </div>
+    <div id="particles-container"></div>
+
+    <header class="navbar">
+        <nav class="navbar-menu">
+            <a href="index.html">ГЛАВНОЕ</a>
+            <a href="#" class="active">КАТАЛОГ</a>
+            <a href="builds.html">СБОРКИ</a>
+            <a href="blog.html">БЛОГ</a>
+            <a href="#">КОНТАКТЫ</a>
+            <a href="#">КАБИНЕТ</a>
+        </nav>
+    </header>
+
+    <section class="catalog-section">
+        <h1 class="catalog-title">Каталог</h1>
+
+        <div class="bento-grid">
+
+            <div class="bento-card span-2-row" data-title="RTX 4090" data-desc="Флагманская видеокарта с невероятной мощностью. Оснащена новейшей системой охлаждения и трассировкой лучей." data-price="$1,599">
+                <div class="border-glow-wrapper"><div class="border-glow"></div></div>
+                <div class="card-inner">
+                    <img src="RTX_4090.png" class="card-img" alt="GPU" draggable="false">
+                    <h3 class="card-title">RTX 4090</h3>
+                </div>
+            </div>
+
+            <div class="bento-card span-2-col" data-title="Intel i9" data-desc="Высокопроизводительный процессор для любых рабочих задач и киберспорта." data-price="$599">
+                <div class="border-glow-wrapper"><div class="border-glow"></div></div>
+                <div class="card-inner">
+                    <img src="Intel_i9.png" class="card-img" alt="CPU" draggable="false">
+                    <h3 class="card-title">Intel i9</h3>
+                </div>
+            </div>
+
+            <div class="bento-card" data-title="Fury RAM" data-desc="Быстрая оперативная память стандарта DDR5." data-price="$199">
+                <div class="border-glow-wrapper"><div class="border-glow"></div></div>
+                <div class="card-inner">
+                    <img src="Fyru_RAM.png" class="card-img" alt="RAM" draggable="false">
+                    <h3 class="card-title">Fury RAM</h3>
+                </div>
+            </div>
+
+            <div class="bento-card span-large" data-title="Z790 Motherboard" data-desc="Материнская плата премиум-класса для оверклокинга. Поддержка PCIe 5.0 и Wi-Fi 6E." data-price="$499">
+                <div class="border-glow-wrapper"><div class="border-glow"></div></div>
+                <div class="card-inner">
+                    <img src="Mother_board.png" class="card-img" alt="MB" draggable="false">
+                    <h3 class="card-title">Z790 Board</h3>
+                </div>
+            </div>
+
+            <div class="bento-card" data-title="Crucial M.2" data-desc="Сверхбыстрый SSD накопитель на 2 ТБ." data-price="$150">
+                <div class="border-glow-wrapper"><div class="border-glow"></div></div>
+                <div class="card-inner">
+                    <img src="SSD_m2.png" class="card-img" alt="SSD" draggable="false">
+                    <h3 class="card-title">Crucial M.2</h3>
+                </div>
+            </div>
+
+             <div class="bento-card span-2-col" data-title="RX 7900 XTX" data-desc="Мощный конкурент от AMD. Идеально для 4K гейминга без компромиссов." data-price="$999">
+                <div class="border-glow-wrapper"><div class="border-glow"></div></div>
+                <div class="card-inner">
+                    <img src="videocard.png" class="card-img" alt="GPU AMD" draggable="false">
+                    <h3 class="card-title">RX 7900</h3>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <div class="catalog-modal" id="modal">
+        <div class="close-modal" id="close-btn">&times;</div>
+        <div class="modal-content-wrapper">
+            <div class="modal-img-container">
+                <img src="" id="modal-img" class="modal-img">
+            </div>
+            <div class="modal-details">
+                <h2 id="modal-title">Название</h2>
+                <p id="modal-desc">Подробное описание товара...</p>
+                <div class="price" id="modal-price">$0</div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
