@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Сборки - Monochrome Glass</title>
+    <link rel="stylesheet" href="builds.css">
+</head>
+<body>
+
+    <div class="page-transition-overlay"></div>
+
+    <div class="ambient-background">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+        <div class="blob blob-4"></div>
+    </div>
+    <div id="particles-container"></div>
+
+    <header class="navbar">
+        <nav class="navbar-menu">
+            <a href="index.html">ГЛАВНОЕ</a>
+            <a href="catalog.html">КАТАЛОГ</a>
+            <a href="#" class="active">СБОРКИ</a>
+            <a href="blog.html">БЛОГ</a>
+            <a href="#">КОНТАКТЫ</a>
+            <a href="#">КАБИНЕТ</a>
+        </nav>
+    </header>
+
+    <main class="builds-container">
+        <div class="info-panel-wrapper">
+            <div class="build-info-panel" id="info-panel">
+                <h1 id="b-title">...</h1>
+                <h3 id="b-subtitle">...</h3>
+                <p id="b-desc">...</p>
+                <div class="build-price" id="b-price">...</div>
+                <button class="buy-btn" onclick="document.getElementById('catalog').scrollIntoView();">Смотреть все сборки</button>
+            </div>
+        </div>
+
+        <div class="carousel-wrapper" id="carousel-area"></div>
+    </main>
+
+    <section class="catalog-section" id="catalog">
+        <div class="catalog-header" id="catalog-header">
+            <h2>Все сборки в наличии</h2>
+        </div>
+        <div class="catalog-grid" id="catalog-grid"></div>
+    </section>
+
+    <div class="specs-tooltip" id="specs-tooltip">
+        <div class="tt-header" id="tt-name">Название</div>
+        <div class="tt-row"><span class="tt-label">Процессор:</span><span class="tt-value" id="tt-cpu">...</span></div>
+        <div class="tt-row"><span class="tt-label">Видеокарта:</span><span class="tt-value" id="tt-gpu">...</span></div>
+        <div class="tt-row"><span class="tt-label">Опер. память:</span><span class="tt-value" id="tt-ram">...</span></div>
+        <div class="tt-row"><span class="tt-label">Накопитель:</span><span class="tt-value" id="tt-ssd">...</span></div>
+    </div>
+
+    <script src="builds.js"></script>
+</body>
+</html>
