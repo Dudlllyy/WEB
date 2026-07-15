@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Блог - Monochrome Glass</title>
+    <style>
+        /* Общие сбросы */
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+
+        html { background-color: #0a0b10; scroll-behavior: smooth; }
+
+        img {
+            -webkit-user-drag: none; -khtml-user-drag: none; -moz-user-drag: none; -o-user-drag: none;
+            user-select: none; pointer-events: none;
+        }
+
+        body {
+            background-color: #0a0b10;
+            background-image: radial-gradient(circle at top right, #1f2029 0%, #13141c 50%, #0a0b10 100%);
+            background-attachment: fixed;
+            color: #ffffff; min-height: 100vh; overflow-x: hidden; overflow-y: auto;
+            display: flex; flex-direction: column; position: relative;
+        }
+
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.2); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.4); }
+
+        /* ================= ПЛАВНОЕ ПОЯВЛЕНИЕ СТРАНИЦЫ ================= */
+        .page-transition-overlay {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background-color: #0a0b10; z-index: 999999;
+            animation: fadeOutOverlay 1s cubic-bezier(0.25, 1, 0.5, 1) 0.2s forwards;
+            pointer-events: none;
+        }
+        @keyframes fadeOutOverlay {
+            0% { opacity: 1; }
+            100% { opacity: 0; visibility: hidden; }
+        }
+
+        /* --- ФОН И ПЫЛИНКИ --- */
+        .ambient-background {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; overflow: hidden;
+            z-index: -2; filter: blur(100px); -webkit-filter: blur(100px); transform: translateZ(0); will-change: transform;
+        }
+        .blob { position: absolute; border-radius: 50%; animation: float 25s infinite ease-in-out alternate; background: rgba(255, 255, 255, 0.05); }
+
+        .blob-1 { width: 50vw; height: 50vw; top: 0%; left: -10%; animation-duration: 30s; }
+        .blob-2 { width: 45vw; height: 45vw; top: 30%; right: -10%; animation-duration: 35s; animation-delay: -5s; }
+        .blob-3 { width: 40vw; height: 40vw; top: 60%; left: 30%; animation-duration: 28s; animation-delay: -10s; }
+        .blob-4 { width: 55vw; height: 55vw; top: 85%; right: 10%; animation-duration: 32s; animation-delay: -2s; }
+        @keyframes float { 0% { transform: translate3d(0, 0, 0) scale(1); } 50% { transform: translate3d(3vw, 5vh, 0) scale(1.05); } 100% { transform: translate3d(-5vw, -8vh, 0) scale(0.95); } }
+
+        #particles-container {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            z-index: -1; pointer-events: none; overflow: hidden;
+        }
+        .particle { position: absolute; background: rgba(255, 255, 255, 0.8); border-radius: 50%; will-change: transform, opacity; }
+        @keyframes drift { 0% { transform: translate3d(0, 0, 0); opacity: 0; } 20% { opacity: 0.3; } 80% { opacity: 0.3; } 100% { transform: translate3d(5vw, -20vh, 0); opacity: 0; } }
+
+        /* НАВИГАЦИЯ */
+        .navbar { display: flex; justify-content: center; padding: 20px 0; z-index: 100; position: fixed; width: 100%; opacity: 0; animation: navFadeDown 1s cubic-bezier(0.25, 1, 0.5, 1) 0.5s forwards; }
+        @keyframes navFadeDown { 0% { opacity: 0; transform: translateY(-30px); } 100% { opacity: 1; transform: translateY(0); } }
+        .navbar-menu {
+            display: flex; gap: 30px; padding: 15px 40px; border-radius: 30px;
+            background: rgba(255, 255, 255, 0.02); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
+            border: 1px solid rgba(255, 255, 255, 0.05); border-top: 1px solid rgba(255, 255, 255, 0.2); border-left: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5);
+        }
+        .navbar-menu a { text-decoration: none; color: rgba(255, 255, 255, 0.6); font-size: 13px; font-weight: 600; letter-spacing: 1px; transition: color 0.3s; }
+        .navbar-menu a:hover { color: #ffffff; }
+        .navbar-menu a.active { color: #ffffff; border-bottom: 2px solid #fff; padding-bottom: 2px; }
+
+        /* ================= БЛОГ СЕКЦИЯ ================= */
+        .blog-section {
+            width: 100%; padding: 140px 100px 80px; max-width: 1600px; margin: 0 auto; position: relative; z-index: 10;
+        }
+
+        .blog-header {
+            text-align: center; border-bottom: 1px solid rgba(255, 255, 255, 0.1); padding-bottom: 30px; margin-bottom: 40px;
+            opacity: 0; transform: translateY(30px);
+            animation: contentFadeUp 1s cubic-bezier(0.25, 1, 0.5, 1) 0.6s forwards;
+        }
+        @keyframes contentFadeUp {
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .blog-header h1 { font-size: 3rem; font-weight: bold; color: #fff; margin-bottom: 15px; }
+        .blog-header p { font-size: 1.1rem; color: rgba(255, 255, 255, 0.6); }
+
+        /* СЕТКА БЛОГА (3 Колонки, как на референсе) */
+        .blog-grid {
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; justify-content: center;
+        }
+
+        /* КАРТОЧКА БЛОГА */
+        .blog-card {
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.03) 0%, rgba(255, 255, 255, 0.01) 100%);
+            border: 1px solid rgba(255, 255, 255, 0.08); border-top: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 20px; display: flex; flex-direction: column;
+            cursor: pointer; position: relative; overflow: hidden; backdrop-filter: blur(15px);
+            opacity: 0; transform: translateY(40px);
+            transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease, border-color 0.3s ease, background 0.3s ease;
+        }
+
+        .blog-card.is-visible { opacity: 1; transform: translateY(0); }
+
+        .blog-card.is-visible:hover {
+            transform: translateY(-8px); background: linear-gradient(180deg, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0.02) 100%);
+            border-color: rgba(255, 255, 255, 0.2); box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
+        }
+
+        .card-img-wrapper {
+            width: 100%; height: 220px; overflow: hidden; position: relative;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .card-img-wrapper img {
+            width: 100%; height: 100%; object-fit: cover;
+            transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+
+        .blog-card.is-visible:hover .card-img-wrapper img { transform: scale(1.08); }
+
+        .card-content {
+            padding: 25px; display: flex; flex-direction: column; flex: 1;
+        }
+
+        .card-title {
+            color: #fff; font-size: 1.3rem; font-weight: 700; margin-bottom: 15px; line-height: 1.3;
+            display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+        }
+
+        .card-desc {
+            color: rgba(255, 255, 255, 0.6); font-size: 0.95rem; line-height: 1.5; margin-bottom: 25px;
+            display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
+        }
+
+        /* Футер карточки (просмотры и дата) */
+        .card-meta {
+            margin-top: auto; display: flex; justify-content: space-between; align-items: center;
+            color: rgba(255, 255, 255, 0.4); font-size: 0.85rem; font-weight: 600;
+        }
+
+        .meta-views {
+            display: flex; align-items: center; gap: 6px;
+        }
+
+        .meta-views svg {
+            width: 16px; height: 16px; fill: currentColor; opacity: 0.8;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="page-transition-overlay"></div>
+
+    <div class="ambient-background">
+        <div class="blob blob-1"></div><div class="blob blob-2"></div><div class="blob blob-3"></div><div class="blob blob-4"></div>
+    </div>
+    <div id="particles-container"></div>
+
+    <header class="navbar">
+        <nav class="navbar-menu">
+            <a href="index.html">ГЛАВНОЕ</a>
+            <a href="catalog.html">КАТАЛОГ СБОРОК</a>
+            <a href="builds.html">СБОРКИ</a>
+            <a href="blog.html" class="active">БЛОГ</a>
+            <a href="#">КОНТАКТЫ</a>
+            <a href="#">КАБИНЕТ</a>
+        </nav>
+    </header>
+
+    <section class="blog-section">
+        <div class="blog-header">
+            <h1>Новости</h1>
+            <p>Важные события в мире технологий, наши проекты и все самое интересное.</p>
+        </div>
+
+        <div class="blog-grid" id="blog-grid">
+            </div>
+    </section>
+
+    <script>
+        // Анимация 100 пылинок
+        const particlesContainer = document.getElementById('particles-container');
+        for (let i = 0; i < 100; i++) {
+            let p = document.createElement('div'); p.classList.add('particle');
+            p.style.width = p.style.height = `${Math.random() * 1.5 + 1}px`;
+            p.style.left = `${Math.random() * 100}%`; p.style.top = `${Math.random() * 100}%`;
+            p.style.animation = `drift ${Math.random() * 20 + 15}s linear ${Math.random() * 10}s infinite`;
+            particlesContainer.appendChild(p);
+        }
+
+        // База данных постов (на основе твоего скриншота)
+        const blogPosts = [
+            {
+                title: "Monochrome Glass на фестивале: мощные игровые ПК на площадке",
+                desc: "Мы стали технологическим партнером фестиваля игровой культуры и обеспечили площадку профессиональной игровой инфраструктурой.",
+                img: "https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=2670&auto=format&fit=crop",
+                views: "659", date: "20 мая 2026"
+            },
+            {
+                title: "Мы — технологический партнёр GAMEDNU 2026",
+                desc: "Наши системы были выбраны в качестве основного оборудования для крупнейшего киберспортивного турнира этого года.",
+                img: "https://images.unsplash.com/photo-1598550476439-6847785fcea6?q=80&w=2670&auto=format&fit=crop",
+                views: "488", date: "28 апреля 2026"
+            },
+            {
+                title: "Это было легендарно: как мы покорили DreamBig Fest",
+                desc: "Прошедший выходной на DreamBig Fest выдался по-настоящему жарким: эпицентром событий стал наш фирменный стенд.",
+                img: "https://images.unsplash.com/photo-1511512578047-dfb367046420?q=80&w=2671&auto=format&fit=crop",
+                views: "420", date: "14 апреля 2026"
+            },
+            {
+                title: "Релиз Echoes of Elysium в раннем доступе",
+                desc: "Состоялся выход долгожданной игры. Узнайте подробности о геймплее и системных требованиях от экспертов Monochrome Glass.",
+                img: "https://images.unsplash.com/photo-1614850523459-c2f4c699c52e?q=80&w=2670&auto=format&fit=crop",
+                views: "2 196", date: "27 января 2026"
+            },
+            {
+                title: "NVIDIA представила платформу CUDA-Q для квантовых вычислений",
+                desc: "NVIDIA анонсировала гибридную платформу для интеграции CPU и квантовых процессоров. Узнайте, как это изменит будущее систем.",
+                img: "https://images.unsplash.com/photo-1620803513374-1262d4778546?q=80&w=2574&auto=format&fit=crop",
+                views: "2 110", date: "27 января 2026"
+            },
+            {
+                title: "Intel анонсировала HEDT-процессоры Xeon 600",
+                desc: "Intel представила линейку процессоров Xeon 600 для рабочих станций. Узнайте о возможностях новых чипов в нашей подробной статье.",
+                img: "https://images.unsplash.com/photo-1591488320449-011701bb6704?q=80&w=2670&auto=format&fit=crop",
+                views: "2 142", date: "27 января 2026"
+            }
+        ];
+
+        // Генерация карточек
+        const blogGrid = document.getElementById('blog-grid');
+
+        // SVG Иконка глаза для просмотров
+        const eyeIcon = `<svg viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>`;
+
+        blogPosts.forEach((post) => {
+            const card = document.createElement('div');
+            card.className = 'blog-card';
+            card.innerHTML = `
+                <div class="card-img-wrapper">
+                    <img src="${post.img}" alt="${post.title}">
+                </div>
+                <div class="card-content">
+                    <div class="card-title">${post.title}</div>
+                    <div class="card-desc">${post.desc}</div>
+                    <div class="card-meta">
+                        <div class="meta-views">${eyeIcon} ${post.views}</div>
+                        <div class="meta-date">${post.date}</div>
+                    </div>
+                </div>
+            `;
+            blogGrid.appendChild(card);
+        });
+
+        // ================= АНИМАЦИЯ КАРТОЧЕК ПРИ СКРОЛЛЕ =================
+        const scrollObserver = new IntersectionObserver((entries) => {
+            let delay = 0;
+            entries.forEach((entry) => {
+                if (entry.isIntersecting) {
+                    setTimeout(() => {
+                        entry.target.classList.add('is-visible');
+                    }, delay);
+                    delay += 150; // Каскадная задержка
+                    scrollObserver.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.1 });
+
+        // Наблюдаем за всеми карточками
+        document.querySelectorAll('.blog-card').forEach(card => {
+            scrollObserver.observe(card);
+        });
+
+    </script>
+</body>
+</html>
