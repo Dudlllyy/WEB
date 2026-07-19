@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Контакты - Monochrome Glass</title>
+    <style>
+        /* Общие сбросы */
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+
+        /* ВАЖНО: Фон перенесен на html, чтобы он лежал в самом низу и не перекрывал слои */
+        html {
+            background-color: #0a0b10;
+            background-image: radial-gradient(circle at top right, #1f2029 0%, #13141c 50%, #0a0b10 100%);
+            background-attachment: fixed;
+            scroll-behavior: smooth;
+            scrollbar-color: #1f2029 #0a0b10; /* Ползунок и трек для Firefox */
+            scrollbar-width: thin; /* Тонкий скролл */
+        }
+
+        /* ТЕМНЫЙ СКРОЛЛБАР для Chrome, Edge, Safari */
+        ::-webkit-scrollbar { width: 10px; height: 10px; background-color: #0a0b10; }
+        ::-webkit-scrollbar-track { background: #0a0b10; }
+        ::-webkit-scrollbar-thumb {
+            background: #1f2029;
+            border-radius: 5px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        ::-webkit-scrollbar-thumb:hover { background: #2a2b36; }
+        ::-webkit-scrollbar-button { display: none; } /* Скрываем системные белые стрелочки Windows */
+
+        img { user-select: none; pointer-events: none; }
+
+        body {
+            background-color: transparent; /* Теперь body прозрачный */
+            color: #ffffff;
+            min-height: 100vh;
+            overflow: hidden; /* Блокируем скролл, чтобы интерфейс был как приложение (сохранено!) */
+            display: flex; flex-direction: column; position: relative;
+            animation: pageFadeIn 1s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+        }
+
+        @keyframes pageFadeIn {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+
+        /* ================= ПЛАВНОЕ ПОЯВЛЕНИЕ СТРАНИЦЫ ================= */
+        .page-transition-overlay {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background-color: #0a0b10; z-index: 999999;
+            animation: fadeOutOverlay 1s cubic-bezier(0.25, 1, 0.5, 1) 0.2s forwards;
+            pointer-events: none;
+        }
+        @keyframes fadeOutOverlay {
+            0% { opacity: 1; }
+            100% { opacity: 0; visibility: hidden; }
+        }
+
+        /* --- ФОН И ПЫЛИНКИ --- */
+        .ambient-background {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            overflow: hidden; z-index: -2; filter: blur(100px); -webkit-filter: blur(100px); pointer-events: none;
+        }
+        .blob { position: absolute; border-radius: 50%; animation: float 25s infinite ease-in-out alternate; background: rgba(255, 255, 255, 0.05); }
+
+        /* Раскидываем 6 пятен, как на остальных страницах */
+        .blob-1 { width: 50vw; height: 50vw; top: 0%; left: -10%; animation-duration: 30s; }
+        .blob-2 { width: 45vw; height: 45vw; top: 30%; right: -10%; animation-duration: 35s; animation-delay: -5s; }
+        .blob-3 { width: 40vw; height: 40vw; top: 60%; left: 30%; animation-duration: 28s; animation-delay: -10s; }
+        .blob-4 { width: 55vw; height: 55vw; top: 85%; right: 10%; animation-duration: 32s; animation-delay: -2s; }
+        .blob-5 { width: 45vw; height: 45vw; top: 10%; left: 60%; animation-duration: 25s; animation-delay: -7s; }
+        .blob-6 { width: 60vw; height: 60vw; top: 70%; left: -10%; animation-duration: 34s; animation-delay: -3s; }
+
+        @keyframes float { 0% { transform: translate3d(0, 0, 0) scale(1); } 50% { transform: translate3d(3vw, 5vh, 0) scale(1.05); } 100% { transform: translate3d(-5vw, -8vh, 0) scale(0.95); } }
+
+        #particles-container {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -1; pointer-events: none; overflow: hidden;
+        }
+        .particle { position: absolute; background: rgba(255, 255, 255, 0.8); border-radius: 50%; will-change: transform, opacity; }
+        @keyframes drift { 0% { transform: translate3d(0, 0, 0); opacity: 0; } 20% { opacity: 0.3; } 80% { opacity: 0.3; } 100% { transform: translate3d(5vw, -20vh, 0); opacity: 0; } }
+
+        /* НАВИГАЦИЯ */
+        .navbar { display: flex; justify-content: center; padding: 20px 0; z-index: 100; position: fixed; width: 100%; animation: navFadeDown 1s cubic-bezier(0.25, 1, 0.5, 1) forwards; }
+        @keyframes navFadeDown { 0% { opacity: 0; transform: translateY(-30px); } 100% { opacity: 1; transform: translateY(0); } }
+        .navbar-menu {
+            display: flex; gap: 30px; padding: 15px 40px; border-radius: 30px;
+            background: rgba(255, 255, 255, 0.02); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
+            border: 1px solid rgba(255, 255, 255, 0.05); border-top: 1px solid rgba(255, 255, 255, 0.2); border-left: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5);
+        }
+        .navbar-menu a { text-decoration: none; color: rgba(255, 255, 255, 0.6); font-size: 13px; font-weight: 600; letter-spacing: 1px; transition: color 0.3s; }
+        .navbar-menu a:hover { color: #ffffff; }
+        .navbar-menu a.active { color: #ffffff; border-bottom: 2px solid #fff; padding-bottom: 2px; }
+
+        /* ОБЩИЙ КЛАСС СТЕКЛА */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.02); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
+            border-radius: 30px; border: 1px solid rgba(255, 255, 255, 0.05);
+            border-top: 1px solid rgba(255, 255, 255, 0.2); border-left: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5), inset 0 0 20px rgba(255, 255, 255, 0.02);
+        }
+
+        /* ================= КОНТЕЙНЕР КОНТАКТОВ ================= */
+        .contacts-wrapper {
+            position: relative; width: 100%; height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center;
+        }
+
+        .page-title {
+            font-size: 3.5rem; font-weight: bold; margin-bottom: 60px; text-transform: uppercase; letter-spacing: 2px;
+            transition: all 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+        .page-title.hidden { opacity: 0; transform: translateY(-30px); pointer-events: none; }
+
+        /* 3 ОСНОВНЫЕ КАРТОЧКИ */
+        .main-cards-container {
+            display: flex; gap: 40px; transition: all 0.6s cubic-bezier(0.25, 1, 0.5, 1); z-index: 10;
+        }
+        .main-cards-container.hidden { opacity: 0; transform: scale(0.9); pointer-events: none; }
+
+        .contact-card {
+            width: 320px; height: 420px; padding: 25px; display: flex; flex-direction: column; cursor: pointer;
+            transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.4s ease; position: relative;
+        }
+
+        /* ЗАСВЕТ НА ЗАДНЕМ ФОНЕ КАРТОЧКИ (Glow effect) */
+        .contact-card::before {
+            content: ''; position: absolute; top: 10%; left: 10%; width: 80%; height: 80%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.15) 0%, transparent 70%);
+            border-radius: 50%; opacity: 0; z-index: -1; transition: opacity 0.4s ease, transform 0.4s ease;
+            filter: blur(30px); transform: scale(0.8);
+        }
+
+        .contact-card:hover { transform: translateY(-15px) scale(1.02); box-shadow: 0 40px 80px rgba(0, 0, 0, 0.8), inset 0 0 30px rgba(255, 255, 255, 0.05); }
+        .contact-card:hover::before { opacity: 1; transform: scale(1.3); }
+
+        .card-image-placeholder {
+            width: 100%; height: 220px; background: rgba(10, 11, 16, 0.5); border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.05); margin-bottom: 30px;
+            display: flex; justify-content: center; align-items: center; overflow: hidden;
+        }
+        .card-image-placeholder img { width: 100%; height: 100%; object-fit: cover; opacity: 0.8; transition: opacity 0.3s; }
+        .contact-card:hover .card-image-placeholder img { opacity: 1; }
+
+        .card-text { font-size: 1.5rem; font-weight: 600; text-align: center; color: #fff; margin-top: auto; padding-bottom: 20px; }
+
+        /* КНОПКА НАЗАД */
+        .back-btn {
+            position: absolute; top: 120px; left: 80px; padding: 12px 30px; font-size: 1rem; font-weight: bold; color: white;
+            background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 30px;
+            cursor: pointer; backdrop-filter: blur(10px); transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+            opacity: 0; transform: translateX(-50px); pointer-events: none; z-index: 100;
+        }
+        .back-btn:hover { background: rgba(255, 255, 255, 0.15); box-shadow: 0 0 20px rgba(255, 255, 255, 0.1); transform: translateX(5px); }
+        .back-btn.visible { opacity: 1; transform: translateX(0); pointer-events: all; }
+
+        /* ================= ДЕТАЛЬНЫЕ ОКНА (АНИМАЦИИ) ================= */
+        .detail-view {
+            position: absolute; top: 180px; width: 100%; max-width: 1400px; display: flex; justify-content: center; gap: 40px;
+            opacity: 0; pointer-events: none; transition: opacity 0.4s; z-index: 20; padding: 0 40px;
+        }
+        .detail-view.active { opacity: 1; pointer-events: all; }
+
+        .slide-left { transform: translateX(-100vw); transition: transform 0.8s cubic-bezier(0.25, 1, 0.5, 1); }
+        .slide-right { transform: translateX(100vw); transition: transform 0.8s cubic-bezier(0.25, 1, 0.5, 1); }
+        .slide-up { transform: translateY(100vh); transition: transform 0.8s cubic-bezier(0.25, 1, 0.5, 1); }
+
+        .detail-view.active .slide-left,
+        .detail-view.active .slide-right,
+        .detail-view.active .slide-up { transform: translate(0); }
+
+        /* --- ВЬЮ 1: НАПИСАТЬ НАМ --- */
+        .msg-left { flex: 0 0 350px; display: flex; flex-direction: column; gap: 25px; }
+        .info-block { padding: 30px; display: flex; flex-direction: column; justify-content: center; }
+        .info-label { font-size: 1.1rem; color: rgba(255, 255, 255, 0.5); margin-bottom: 10px; }
+        .info-value { font-size: 1.3rem; font-weight: bold; color: #fff; }
+
+        .msg-right { flex: 1; max-width: 800px; padding: 50px; display: flex; flex-direction: column; }
+        .form-group { margin-bottom: 25px; }
+        .form-group label { display: block; font-size: 1.1rem; color: rgba(255, 255, 255, 0.8); margin-bottom: 10px; }
+        .form-group input, .form-group textarea {
+            width: 100%; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px; padding: 18px 25px; color: white; font-size: 1rem; outline: none; transition: all 0.3s;
+        }
+        .form-group input:focus, .form-group textarea:focus { border-color: rgba(255, 255, 255, 0.5); background: rgba(255, 255, 255, 0.08); box-shadow: 0 0 20px rgba(255, 255, 255, 0.05); }
+        .form-group textarea { resize: none; height: 180px; }
+
+        .submit-btn {
+            align-self: flex-end; padding: 15px 40px; font-size: 1.1rem; font-weight: bold; color: #fff;
+            background: linear-gradient(90deg, rgba(255,255,255,0.1), rgba(255,255,255,0.2));
+            border: 1px solid rgba(255,255,255,0.3); border-radius: 30px; cursor: pointer; transition: all 0.3s;
+        }
+        .submit-btn:hover { transform: scale(1.05); box-shadow: 0 10px 20px rgba(0,0,0,0.5), 0 0 15px rgba(255,255,255,0.2); }
+
+        /* --- ВЬЮ 2: ЧАТ-БОТ --- */
+        .chatbot-container { width: 100%; max-width: 1000px; height: 600px; display: flex; flex-direction: column; padding: 0; overflow: hidden; }
+        .chat-header-main { text-align: center; padding: 30px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
+        .chat-header-main h2 { font-size: 2rem; margin-bottom: 10px; }
+        .chat-header-main p { color: rgba(255, 255, 255, 0.5); font-size: 0.9rem; }
+
+        .chat-top-bar { display: flex; justify-content: space-between; align-items: center; padding: 15px 30px; background: rgba(0,0,0,0.2); border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
+        .chat-top-bar .bot-name { font-weight: bold; }
+        .chat-top-bar .controls { display: flex; gap: 10px; }
+        .chat-btn { padding: 5px 15px; background: rgba(255,255,255,0.1); border-radius: 10px; border: none; color: white; cursor: pointer; font-size: 0.8rem; }
+
+        .chat-area { flex: 1; padding: 30px; display: flex; flex-direction: column; gap: 20px; overflow-y: auto; }
+        .chat-msg { max-width: 70%; padding: 15px 20px; border-radius: 20px; font-size: 0.95rem; line-height: 1.4; }
+        .msg-bot { background: rgba(255, 255, 255, 0.05); align-self: flex-start; border-bottom-left-radius: 5px; }
+        .msg-user { background: rgba(255, 255, 255, 0.15); align-self: flex-end; border-bottom-right-radius: 5px; }
+
+        .chat-input-area { padding: 20px 30px; background: rgba(0,0,0,0.3); border-top: 1px solid rgba(255, 255, 255, 0.05); display: flex; align-items: center; gap: 15px; }
+        .chat-input { flex: 1; background: transparent; border: none; color: white; outline: none; font-size: 1rem; }
+        .chat-input::placeholder { color: rgba(255,255,255,0.3); }
+        .chat-icon-btn { width: 40px; height: 40px; border-radius: 50%; background: rgba(255,255,255,0.05); border: none; color: white; cursor: pointer; display: flex; justify-content: center; align-items: center; transition: 0.3s; }
+        .chat-icon-btn:hover { background: rgba(255,255,255,0.15); }
+
+        /* --- ВЬЮ 3: КАРТА --- */
+        .map-left { flex: 1; max-width: 800px; padding: 10px; }
+        .map-container { width: 100%; height: 100%; min-height: 450px; border-radius: 20px; overflow: hidden; background: #111; }
+        .map-container iframe { width: 100%; height: 100%; border: none; filter: invert(90%) hue-rotate(180deg) brightness(80%) contrast(120%); }
+
+        .map-right { flex: 0 0 400px; padding: 50px 40px; display: flex; flex-direction: column; justify-content: center; gap: 30px; }
+        .address-title { font-size: 2rem; font-weight: bold; margin-bottom: 10px; }
+        .address-text { font-size: 1.1rem; color: rgba(255,255,255,0.7); line-height: 1.6; }
+        .work-hours { margin-top: 20px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1); }
+        .work-hours div { margin-bottom: 10px; display: flex; justify-content: space-between; color: rgba(255,255,255,0.8); }
+
+    </style>
+</head>
+<body>
+
+    <div class="page-transition-overlay"></div>
+
+    <!-- Фоны -->
+    <div class="ambient-background">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+        <div class="blob blob-4"></div>
+        <div class="blob blob-5"></div>
+        <div class="blob blob-6"></div>
+    </div>
+    <div id="particles-container"></div>
+
+    <!-- Навигация -->
+    <header class="navbar">
+        <nav class="navbar-menu">
+            <a href="index.html">ГЛАВНОЕ</a>
+            <a href="catalog.html">КАТАЛОГ</a>
+            <a href="builds.html">СБОРКИ</a>
+            <a href="blog.html">БЛОГ</a>
+            <a href="#" class="active">КОНТАКТЫ</a>
+            <a href="cabinet.html">КАБИНЕТ</a>
+        </nav>
+    </header>
+
+    <button class="back-btn" id="back-btn" onclick="closeAllViews()">&larr; Назад</button>
+
+    <main class="contacts-wrapper">
+        <h1 class="page-title" id="page-title">Наши контакты</h1>
+
+        <!-- ОСНОВНОЙ ВИД (3 КАРТОЧКИ) -->
+        <div class="main-cards-container" id="main-cards">
+
+            <div class="contact-card glass-panel" onclick="openView('view-message')">
+                <div class="card-image-placeholder">
+                    <img src="contact.png" alt="Message">
+                </div>
+                <div class="card-text">Написать нам</div>
+            </div>
+
+            <div class="contact-card glass-panel" onclick="openView('view-chatbot')">
+                <div class="card-image-placeholder">
+                    <img src="bot.png" alt="AI Bot">
+                </div>
+                <div class="card-text">Задать вопрос<br>чат боту</div>
+            </div>
+
+            <div class="contact-card glass-panel" onclick="openView('view-map')">
+                <div class="card-image-placeholder">
+                    <img src="map.png" alt="Map">
+                </div>
+                <div class="card-text">Найти нас на<br>карте</div>
+            </div>
+
+        </div>
+
+        <!-- ================= ВСПЛЫВАЮЩИЕ ОКНА ================= -->
+
+        <!-- 1. ОКНО: НАПИСАТЬ НАМ -->
+        <div class="detail-view" id="view-message">
+            <div class="msg-left slide-left">
+                <div class="info-block glass-panel">
+                    <div class="info-label">Email</div>
+                    <div class="info-value">support@monochrome.com</div>
+                </div>
+                <div class="info-block glass-panel">
+                    <div class="info-label">Phone</div>
+                    <div class="info-value">+1 (777) 555-212</div>
+                </div>
+                <div class="info-block glass-panel">
+                    <div class="info-label">Location</div>
+                    <div class="info-value">30 North Gould, Suite A</div>
+                </div>
+            </div>
+
+            <div class="msg-right glass-panel slide-right">
+                <div class="form-group">
+                    <label>Ваше имя</label>
+                    <input type="text" placeholder="Введите имя">
+                </div>
+                <div class="form-group">
+                    <label>Ваша почта</label>
+                    <input type="email" placeholder="example@mail.com">
+                </div>
+                <div class="form-group">
+                    <label>Ваше сообщение</label>
+                    <textarea placeholder="Опишите вашу проблему или вопрос..."></textarea>
+                </div>
+                <button class="submit-btn">Отправить &rarr;</button>
+            </div>
+        </div>
+
+        <!-- 2. ОКНО: ЧАТ-БОТ -->
+        <div class="detail-view" id="view-chatbot">
+            <div class="chatbot-container glass-panel slide-up">
+
+                <div class="chat-header-main">
+                    <h2>Live chat support</h2>
+                    <p>Chat with our AI assistant 24/7 to get quick resolutions and guidance.</p>
+                </div>
+
+                <div class="chat-top-bar">
+                    <div class="bot-name">Ai Assistant</div>
+                    <div class="controls">
+                        <button class="chat-btn">Today</button>
+                        <button class="chat-btn">...</button>
+                    </div>
+                </div>
+
+                <div class="chat-area">
+                    <div class="chat-msg msg-bot">
+                        Good morning, are you ready for classes?<br>today, so important for you<br><small style="opacity:0.5; font-size:10px;">08:05 ✓✓</small>
+                    </div>
+                    <div class="chat-msg msg-user">I'm prepared and eager to start</div>
+                    <div class="chat-msg msg-user">Can you send me the new task?</div>
+                    <div class="chat-msg msg-user">Thank you!</div>
+                </div>
+
+                <div class="chat-input-area">
+                    <button class="chat-icon-btn">🎙️</button>
+                    <button class="chat-icon-btn">📎</button>
+                    <input type="text" class="chat-input" placeholder="Describe your product or service...">
+                    <button class="chat-icon-btn" style="background: rgba(255,255,255,0.2);">➤</button>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- 3. ОКНО: КАРТА -->
+        <div class="detail-view" id="view-map">
+            <div class="map-left glass-panel slide-left">
+                <div class="map-container">
+                    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d193595.2528000654!2d-74.14483038670564!3d40.69766374865866!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x89c24fa5d33f083b%3A0xc80b8f06e177fe62!2sNew%20York%2C%20NY%2C%20USA!5e0!3m2!1sen!2s!4v1690000000000!5m2!1sen!2s" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                </div>
+            </div>
+            <div class="map-right glass-panel slide-right">
+                <div class="address-title">Наш офис</div>
+                <div class="address-text">
+                    Главный штаб Monochrome Glass.<br>
+                    30 North Gould St, Suite A,<br>
+                    Sheridan, Wyoming 82801, USA
+                </div>
+
+                <div class="work-hours">
+                    <div><span>Понедельник - Пятница:</span> <span>09:00 - 20:00</span></div>
+                    <div><span>Суббота - Воскресенье:</span> <span>10:00 - 18:00</span></div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        // Анимация 120 пылинок (как на главной)
+        const particlesContainer = document.getElementById('particles-container');
+        for (let i = 0; i < 120; i++) {
+            let p = document.createElement('div'); p.classList.add('particle');
+            p.style.width = p.style.height = `${Math.random() * 1.5 + 1}px`;
+            p.style.left = `${Math.random() * 100}%`; p.style.top = `${Math.random() * 100}%`;
+            p.style.animation = `drift ${Math.random() * 20 + 15}s linear ${Math.random() * 10}s infinite`;
+            particlesContainer.appendChild(p);
+        }
+
+        // Логика переключения экранов
+        const mainCards = document.getElementById('main-cards');
+        const pageTitle = document.getElementById('page-title');
+        const backBtn = document.getElementById('back-btn');
+        const allViews = document.querySelectorAll('.detail-view');
+
+        function openView(viewId) {
+            mainCards.classList.add('hidden');
+            pageTitle.classList.add('hidden');
+
+            setTimeout(() => {
+                document.getElementById(viewId).classList.add('active');
+                backBtn.classList.add('visible');
+            }, 300);
+        }
+
+        function closeAllViews() {
+            allViews.forEach(view => view.classList.remove('active'));
+            backBtn.classList.remove('visible');
+
+            setTimeout(() => {
+                mainCards.classList.remove('hidden');
+                pageTitle.classList.remove('hidden');
+            }, 400);
+        }
+    </script>
+</body>
+</html>
