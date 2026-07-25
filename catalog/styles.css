@@ -1,69 +1,96 @@
 /* Общие сбросы */
 * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
 
-html { background-color: #0a0b10; }
+html {
+    background-color: #0a0b10;
+    background-image: radial-gradient(circle at top right, #1f2029 0%, #13141c 50%, #0a0b10 100%);
+    background-attachment: fixed;
+    scroll-behavior: smooth;
+    scrollbar-color: #1f2029 #0a0b10; /* Ползунок и трек для Firefox */
+    scrollbar-width: thin; /* Тонкий скролл */
+}
+
+/* ТЕМНЫЙ СКРОЛЛБАР для Chrome, Edge, Safari */
+::-webkit-scrollbar { width: 10px; height: 10px; background-color: #0a0b10; }
+::-webkit-scrollbar-track { background: #0a0b10; }
+::-webkit-scrollbar-thumb {
+    background: #1f2029;
+    border-radius: 5px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+::-webkit-scrollbar-thumb:hover { background: #2a2b36; }
+::-webkit-scrollbar-button { display: none; } /* Скрываем системные белые стрелочки Windows */
+
+img { user-select: none; pointer-events: none; }
 
 body {
     background-color: #0a0b10;
-    /* Базовый темный градиент фиксируем, чтобы он не растягивался и не искажался */
     background-image: radial-gradient(circle at top right, #1f2029 0%, #13141c 50%, #0a0b10 100%);
     background-attachment: fixed;
-
     color: #ffffff; min-height: 100vh; overflow-x: hidden;
     display: flex; flex-direction: column; position: relative;
     animation: pageFadeIn 1s cubic-bezier(0.25, 1, 0.5, 1) forwards;
 }
+
 @keyframes pageFadeIn {
     0% { opacity: 0; }
     100% { opacity: 1; }
 }
 
-/* Скроллбар */
-::-webkit-scrollbar { width: 8px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.2); border-radius: 4px; }
-::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.4); }
-
-/* --- ФОН И ПЫЛИНКИ (ТЕПЕРЬ ПРОКРУЧИВАЮТСЯ ВМЕСТЕ С САЙТОМ) --- */
+/* --- ФОН И ПЫЛИНКИ --- */
 .ambient-background {
-    position: absolute; /* Было fixed */
-    top: 0; left: 0; width: 100%; height: 100%; /* Растягиваем на всю длину страницы */
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
     overflow: hidden;
     z-index: -2; filter: blur(100px); -webkit-filter: blur(100px); will-change: transform; transform: translateZ(0);
 }
+
 .blob { position: absolute; border-radius: 50%; animation: float 25s infinite ease-in-out alternate; background: rgba(255, 255, 255, 0.05); }
 
-/* Раскидываем световые пятна по всей длине каталога */
 .blob-1 { width: 50vw; height: 50vw; top: 0%; left: -10%; animation-duration: 30s; }
 .blob-2 { width: 45vw; height: 45vw; top: 30%; right: -10%; animation-duration: 35s; animation-delay: -5s; }
 .blob-3 { width: 40vw; height: 40vw; top: 60%; left: 30%; animation-duration: 28s; animation-delay: -10s; }
 .blob-4 { width: 55vw; height: 55vw; top: 85%; right: 10%; animation-duration: 32s; animation-delay: -2s; }
 
-@keyframes float { 0% { transform: translate3d(0, 0, 0) scale(1); } 50% { transform: translate3d(3vw, 5vh, 0) scale(1.05); } 100% { transform: translate3d(-5vw, -8vh, 0) scale(0.95); } }
+@keyframes float { 
+    0% { transform: translate3d(0, 0, 0) scale(1); } 
+    50% { transform: translate3d(3vw, 5vh, 0) scale(1.05); } 
+    100% { transform: translate3d(-5vw, -8vh, 0) scale(0.95); } 
+}
 
 #particles-container {
-    position: absolute; /* Было fixed */
-    top: 0; left: 0; width: 100%; height: 100%; /* На всю длину страницы */
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
     z-index: -1; pointer-events: none; overflow: hidden;
 }
+
 .particle { position: absolute; background: rgba(255, 255, 255, 0.8); border-radius: 50%; will-change: transform, opacity; }
-@keyframes drift { 0% { transform: translate3d(0, 0, 0); opacity: 0; } 20% { opacity: 0.3; } 80% { opacity: 0.3; } 100% { transform: translate3d(5vw, -20vh, 0); opacity: 0; } }
+
+@keyframes drift { 
+    0% { transform: translate3d(0, 0, 0); opacity: 0; } 
+    20% { opacity: 0.3; } 
+    80% { opacity: 0.3; } 
+    100% { transform: translate3d(5vw, -20vh, 0); opacity: 0; } 
+}
 
 /* НАВИГАЦИЯ */
 .navbar {
     display: flex; justify-content: center; padding: 20px 0; z-index: 100; position: fixed; width: 100%;
     animation: navFadeDown 1s cubic-bezier(0.25, 1, 0.5, 1) forwards;
 }
+
 @keyframes navFadeDown {
     0% { opacity: 0; transform: translateY(-30px); }
     100% { opacity: 1; transform: translateY(0); }
 }
+
 .navbar-menu {
     display: flex; gap: 30px; padding: 15px 40px; border-radius: 30px;
     background: rgba(255, 255, 255, 0.02); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
     border: 1px solid rgba(255, 255, 255, 0.05); border-top: 1px solid rgba(255, 255, 255, 0.2); border-left: 1px solid rgba(255, 255, 255, 0.15);
     box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5);
 }
+
 .navbar-menu a { text-decoration: none; color: rgba(255, 255, 255, 0.6); font-size: 13px; font-weight: 600; letter-spacing: 1px; transition: color 0.3s; }
 .navbar-menu a:hover { color: #ffffff; }
 .navbar-menu a.active { color: #ffffff; border-bottom: 2px solid #fff; padding-bottom: 2px; }
@@ -73,6 +100,7 @@ body {
     padding: 120px 80px 80px; max-width: 1600px; margin: 0 auto; width: 100%;
     opacity: 0; animation: contentFadeUp 1.2s cubic-bezier(0.25, 1, 0.5, 1) 0.2s forwards;
 }
+
 @keyframes contentFadeUp {
     0% { opacity: 0; transform: translateY(40px); }
     100% { opacity: 1; transform: translateY(0); }
@@ -113,6 +141,7 @@ body {
     background: conic-gradient(from 0deg, transparent 0%, transparent 80%, rgba(255, 255, 255, 0.4) 95%, rgba(255, 255, 255, 1) 100%);
     animation: spin 2.5s linear infinite;
 }
+
 @keyframes spin { 100% { transform: rotate(360deg); } }
 
 .card-inner {
