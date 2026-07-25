@@ -14,6 +14,581 @@
             background-image: radial-gradient(circle at top right, #1f2029 0%, #13141c 50%, #0a0b10 100%);
             background-attachment: fixed;
             scroll-behavior: smooth;
+            scrollbar-color: #1f2029 #0a0b10;
+            scrollbar-width: thin;
+        }
+
+        /* ТЕМНЫЙ СКРОЛЛБАР для Chrome, Edge, Safari */
+        ::-webkit-scrollbar { width: 10px; height: 10px; background-color: #0a0b10; }
+        ::-webkit-scrollbar-track { background: #0a0b10; }
+        ::-webkit-scrollbar-thumb {
+            background: #1f2029;
+            border-radius: 5px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        ::-webkit-scrollbar-thumb:hover { background: #2a2b36; }
+        ::-webkit-scrollbar-button { display: none; }
+
+        img { user-select: none; pointer-events: none; }
+
+        body {
+            background-color: transparent;
+            color: #ffffff;
+            min-height: 100vh;
+            overflow-x: hidden;
+            display: flex; flex-direction: column; position: relative;
+            animation: pageFadeIn 1s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+        }
+
+        @keyframes pageFadeIn {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+
+        /* ================= ПЛАВНОЕ ПОЯВЛЕНИЕ ================= */
+        .page-transition-overlay {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background-color: #0a0b10; z-index: 999999;
+            animation: fadeOutOverlay 0.8s cubic-bezier(0.25, 1, 0.5, 1) forwards; pointer-events: none;
+        }
+        @keyframes fadeOutOverlay { 0% { opacity: 1; } 100% { opacity: 0; visibility: hidden; } }
+
+        /* --- ФОН И ПЫЛИНКИ --- */
+        .ambient-background {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; overflow: hidden;
+            z-index: -2; filter: blur(100px); -webkit-filter: blur(100px); transform: translateZ(0); pointer-events: none;
+        }
+        .blob { position: absolute; border-radius: 50%; animation: float 25s infinite ease-in-out alternate; background: rgba(255, 255, 255, 0.05); }
+
+        .blob-1 { width: 50vw; height: 50vw; top: 0%; left: -10%; animation-duration: 30s; }
+        .blob-2 { width: 45vw; height: 45vw; top: 30%; right: -10%; animation-duration: 35s; animation-delay: -5s; }
+        .blob-3 { width: 40vw; height: 40vw; top: 60%; left: 30%; animation-duration: 28s; animation-delay: -10s; }
+        .blob-4 { width: 55vw; height: 55vw; top: 85%; right: 10%; animation-duration: 32s; animation-delay: -2s; }
+        .blob-5 { width: 45vw; height: 45vw; top: 10%; left: 60%; animation-duration: 25s; animation-delay: -7s; }
+        .blob-6 { width: 60vw; height: 60vw; top: 70%; left: -10%; animation-duration: 34s; animation-delay: -3s; }
+
+        @keyframes float { 0% { transform: translate3d(0, 0, 0) scale(1); } 50% { transform: translate3d(3vw, 5vh, 0) scale(1.05); } 100% { transform: translate3d(-5vw, -8vh, 0) scale(0.95); } }
+
+        #particles-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; overflow: hidden; }
+        .particle { position: absolute; background: rgba(255, 255, 255, 0.8); border-radius: 50%; will-change: transform, opacity; }
+        @keyframes drift { 0% { transform: translate3d(0, 0, 0); opacity: 0; } 20% { opacity: 0.3; } 80% { opacity: 0.3; } 100% { transform: translate3d(5vw, -20vh, 0); opacity: 0; } }
+
+        /* НАВИГАЦИЯ */
+        .navbar { display: flex; justify-content: center; padding: 20px 0; z-index: 100; position: fixed; width: 100%; animation: navFadeDown 1s cubic-bezier(0.25, 1, 0.5, 1) forwards; }
+        @keyframes navFadeDown { 0% { opacity: 0; transform: translateY(-30px); } 100% { opacity: 1; transform: translateY(0); } }
+        .navbar-menu {
+            display: flex; gap: 30px; padding: 15px 40px; border-radius: 30px;
+            background: rgba(255, 255, 255, 0.02); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
+            border: 1px solid rgba(255, 255, 255, 0.05); border-top: 1px solid rgba(255, 255, 255, 0.2); border-left: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5);
+        }
+        .navbar-menu a { text-decoration: none; color: rgba(255, 255, 255, 0.6); font-size: 13px; font-weight: 600; letter-spacing: 1px; transition: color 0.3s; }
+        .navbar-menu a:hover { color: #ffffff; }
+        .navbar-menu a.active { color: #ffffff; border-bottom: 2px solid #fff; padding-bottom: 2px; }
+
+        /* ================= КАБИНЕТ LAYOUT ================= */
+        .cabinet-section {
+            padding: 120px 80px 80px; max-width: 1600px; margin: 0 auto; width: 100%;
+            display: flex; gap: 40px; min-height: 100vh;
+            opacity: 0; animation: contentFadeUp 1s cubic-bezier(0.25, 1, 0.5, 1) 0.3s forwards;
+        }
+        @keyframes contentFadeUp { to { opacity: 1; transform: translateY(0); } }
+
+        /* ЛЕВАЯ ПАНЕЛЬ (ПРОФИЛЬ) */
+        .sidebar { flex: 0 0 300px; display: flex; flex-direction: column; gap: 20px; }
+
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.02); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
+            border-radius: 30px; border: 1px solid rgba(255, 255, 255, 0.05);
+            border-top: 1px solid rgba(255, 255, 255, 0.2); border-left: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5); position: relative; overflow: hidden;
+        }
+
+        .profile-card { padding: 40px 30px; text-align: center; display: flex; flex-direction: column; align-items: center; }
+        .avatar {
+            width: 120px; height: 120px; border-radius: 50%; margin-bottom: 20px;
+            background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.02));
+            border: 2px solid rgba(255,255,255,0.2); padding: 5px; position: relative;
+        }
+        .avatar img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
+
+        .status-dot {
+            position: absolute; bottom: 5px; right: 10px; width: 15px; height: 15px;
+            background: #00ff88; border-radius: 50%; border: 2px solid #0a0b10;
+            box-shadow: 0 0 10px #00ff88;
+        }
+
+        .user-name { font-size: 1.8rem; font-weight: bold; margin-bottom: 5px; }
+        .user-role { font-size: 0.9rem; color: rgba(255,255,255,0.5); font-weight: 600; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 25px;}
+
+        .sidebar-menu { display: flex; flex-direction: column; gap: 10px; width: 100%; }
+        .sidebar-btn {
+            background: transparent; border: none; color: rgba(255,255,255,0.6); padding: 15px 20px;
+            border-radius: 15px; text-align: left; font-size: 1.05rem; font-weight: 600; cursor: pointer;
+            transition: all 0.3s ease; display: flex; align-items: center; gap: 15px;
+        }
+        .sidebar-btn:hover { background: rgba(255,255,255,0.05); color: #fff; transform: translateX(5px); }
+        .sidebar-btn.active { background: rgba(255,255,255,0.1); color: #fff; border-left: 3px solid #fff; border-radius: 0 15px 15px 0; }
+        .sidebar-btn svg { width: 20px; height: 20px; fill: currentColor; }
+
+        /* ПРАВАЯ ПАНЕЛЬ (ДАШБОРД / BENO GRID) */
+        .dashboard { flex: 1; display: grid; grid-template-columns: repeat(3, 1fr); grid-auto-rows: minmax(200px, auto); gap: 30px; }
+
+        .bento-item {
+            opacity: 0; transform: translateY(30px);
+            animation: bentoFadeIn 0.8s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+            padding: 35px; display: flex; flex-direction: column;
+            transform-style: preserve-3d; transition: transform 0.2s ease-out, box-shadow 0.3s ease;
+        }
+        .bento-item:hover { box-shadow: 0 30px 60px rgba(0, 0, 0, 0.8), inset 0 0 30px rgba(255, 255, 255, 0.05); }
+
+        @keyframes bentoFadeIn { to { opacity: 1; transform: translateY(0); } }
+        .bento-item:nth-child(1) { animation-delay: 0.4s; }
+        .bento-item:nth-child(2) { animation-delay: 0.5s; }
+        .bento-item:nth-child(3) { animation-delay: 0.6s; }
+        .bento-item:nth-child(4) { animation-delay: 0.7s; }
+
+        .span-2 { grid-column: span 2; }
+        .span-row-2 { grid-row: span 2; }
+
+        .bento-title { font-size: 1.2rem; font-weight: bold; color: rgba(255,255,255,0.6); margin-bottom: 25px; text-transform: uppercase; letter-spacing: 1px; transform: translateZ(20px); }
+
+        /* --- ВИДЖЕТ 1: ТЕКУЩАЯ СИСТЕМА --- */
+        .system-specs { display: flex; flex-direction: column; gap: 15px; transform: translateZ(30px); margin-bottom: 20px; }
+        .spec-row { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 10px; }
+        .spec-label { color: rgba(255,255,255,0.5); font-size: 0.95rem; }
+        .spec-value { font-weight: 600; font-size: 1.1rem; color: #fff; }
+        .upgrade-btn {
+            margin-top: auto; align-self: flex-start; padding: 12px 25px; font-weight: bold;
+            background: linear-gradient(135deg, rgba(255,255,255,0.2), rgba(255,255,255,0.05));
+            border: 1px solid rgba(255,255,255,0.3); border-radius: 20px; color: #fff; cursor: pointer;
+            transition: all 0.3s;
+        }
+        .upgrade-btn:hover { background: rgba(255,255,255,0.3); transform: translateY(-2px); box-shadow: 0 10px 20px rgba(0,0,0,0.3); }
+
+        /* --- ВИДЖЕТ 2: СТАТУС ЗАКАЗА --- */
+        .order-status { text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; transform: translateZ(30px); }
+        .order-icon { font-size: 3.5rem; margin-bottom: 15px; animation: pulseIcon 2s infinite alternate; }
+        @keyframes pulseIcon { from { transform: scale(1); filter: drop-shadow(0 0 10px rgba(255,255,255,0.2)); } to { transform: scale(1.1); filter: drop-shadow(0 0 25px rgba(255,255,255,0.6)); } }
+        .order-name { font-size: 1.4rem; font-weight: bold; margin-bottom: 10px; }
+        .order-desc { color: rgba(255,255,255,0.6); font-size: 0.95rem; margin-bottom: 25px; }
+
+        .progress-bar-bg { width: 100%; height: 6px; background: rgba(255,255,255,0.1); border-radius: 10px; overflow: hidden; position: relative; }
+        .progress-bar-fill { position: absolute; top: 0; left: 0; height: 100%; width: 65%; background: #fff; box-shadow: 0 0 15px #fff; border-radius: 10px; transition: width 1s ease; }
+        .progress-labels { display: flex; justify-content: space-between; width: 100%; margin-top: 10px; font-size: 0.8rem; color: rgba(255,255,255,0.5); font-weight: bold;}
+
+        /* --- ВИДЖЕТ 3: АКТИВНОСТЬ (ГРАФИК) --- */
+        .activity-chart { display: flex; align-items: flex-end; gap: 10px; height: 120px; margin-top: 10px; transform: translateZ(20px); }
+        .chart-bar { flex: 1; background: rgba(255,255,255,0.1); border-radius: 5px 5px 0 0; position: relative; overflow: hidden; transition: 0.3s; }
+        .chart-bar:hover { background: rgba(255,255,255,0.3); }
+        .chart-fill { position: absolute; bottom: 0; left: 0; width: 100%; background: linear-gradient(0deg, rgba(255,255,255,0.8), rgba(255,255,255,0.2)); }
+
+        /* ================= МОДАЛЬНОЕ ОКНО АВТОРИЗАЦИИ ================= */
+        .auth-overlay {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(10, 11, 16, 0.85); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            z-index: 10000; display: flex; justify-content: center; align-items: center;
+            opacity: 0; pointer-events: none; transition: opacity 0.4s ease;
+        }
+        .auth-overlay.active { opacity: 1; pointer-events: all; }
+
+        .auth-card {
+            width: 100%; max-width: 450px; padding: 40px; display: flex; flex-direction: column; gap: 20px;
+            transform: translateY(30px); transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+        .auth-overlay.active .auth-card { transform: translateY(0); }
+
+        .auth-tabs { display: flex; gap: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 15px; margin-bottom: 10px; }
+        .auth-tab {
+            flex: 1; background: transparent; border: none; color: rgba(255,255,255,0.5); font-size: 1.2rem; font-weight: bold;
+            cursor: pointer; transition: 0.3s; padding-bottom: 5px; text-align: center;
+        }
+        .auth-tab.active { color: #fff; border-bottom: 2px solid #fff; }
+
+        .auth-form { display: flex; flex-direction: column; gap: 20px; }
+        .auth-form.hidden { display: none; }
+
+        .form-group { display: flex; flex-direction: column; gap: 8px; }
+        .form-group label { font-size: 0.9rem; color: rgba(255,255,255,0.7); }
+        .form-group input {
+            width: 100%; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px; padding: 15px 20px; color: white; font-size: 1rem; outline: none; transition: all 0.3s;
+        }
+        .form-group input:focus { border-color: rgba(255, 255, 255, 0.5); background: rgba(255, 255, 255, 0.08); box-shadow: 0 0 20px rgba(255, 255, 255, 0.05); }
+
+        .auth-error { color: #ff4757; font-size: 0.9rem; text-align: center; min-height: 20px; }
+        .guest-hint { color: #00ff88; font-size: 0.85rem; text-align: center; background: rgba(0,255,136,0.05); padding: 10px; border-radius: 10px; border: 1px dashed rgba(0,255,136,0.3); }
+
+        .auth-submit-btn {
+            width: 100%; padding: 15px; font-size: 1.1rem; font-weight: bold; color: #fff;
+            background: linear-gradient(90deg, rgba(255,255,255,0.15), rgba(255,255,255,0.25));
+            border: 1px solid rgba(255,255,255,0.3); border-radius: 20px; cursor: pointer; transition: all 0.3s;
+            margin-top: 10px;
+        }
+        .auth-submit-btn:hover { transform: scale(1.02); box-shadow: 0 10px 20px rgba(0,0,0,0.5), 0 0 15px rgba(255,255,255,0.2); }
+    </style>
+</head>
+<body>
+
+    <div class="page-transition-overlay"></div>
+
+    <!-- Фоны -->
+    <div class="ambient-background">
+        <div class="blob blob-1"></div><div class="blob blob-2"></div><div class="blob blob-3"></div><div class="blob blob-4"></div><div class="blob blob-5"></div><div class="blob blob-6"></div>
+    </div>
+    <div id="particles-container"></div>
+
+    <!-- Навигация -->
+    <header class="navbar">
+        <nav class="navbar-menu">
+            <a href="index.html">ГЛАВНОЕ</a>
+            <a href="catalog.html">КАТАЛОГ</a>
+            <a href="builds.html">СБОРКИ</a>
+            <a href="blog.html">БЛОГ</a>
+            <a href="contacts.html">КОНТАКТЫ</a>
+            <a href="#" class="active">КАБИНЕТ</a>
+        </nav>
+    </header>
+
+    <!-- МОДАЛЬНОЕ ОКНО АВТОРИЗАЦИИ -->
+    <div class="auth-overlay" id="auth-modal">
+        <div class="glass-panel auth-card">
+            <div class="auth-tabs">
+                <button class="auth-tab active" onclick="switchAuthTab('login')">Вход</button>
+                <button class="auth-tab" onclick="switchAuthTab('register')">Регистрация</button>
+            </div>
+
+            <!-- Форма Входа -->
+            <form class="auth-form" id="login-form" onsubmit="handleLogin(event)">
+                <div class="guest-hint">💡 Тестовый доступ: логин <b>guest</b> / пароль <b>guest</b></div>
+                <div class="form-group">
+                    <label>Email или логин</label>
+                    <input type="text" id="login-email" required placeholder="guest" value="guest">
+                </div>
+                <div class="form-group">
+                    <label>Пароль</label>
+                    <input type="password" id="login-password" required placeholder="••••••••" value="guest">
+                </div>
+                <div class="auth-error" id="login-error"></div>
+                <button type="submit" class="auth-submit-btn">Войти в кабинет &rarr;</button>
+            </form>
+
+            <!-- Форма Регистрации -->
+            <form class="auth-form hidden" id="register-form" onsubmit="handleRegister(event)">
+                <div class="form-group">
+                    <label>Имя пользователя</label>
+                    <input type="text" id="reg-username" required placeholder="Ваше имя или никнейм">
+                </div>
+                <div class="form-group">
+                    <label>Email (Почта)</label>
+                    <input type="email" id="reg-email" required placeholder="example@mail.com">
+                </div>
+                <div class="form-group">
+                    <label>Пароль</label>
+                    <input type="password" id="reg-password" required placeholder="••••••••">
+                </div>
+                <div class="auth-error" id="reg-error"></div>
+                <button type="submit" class="auth-submit-btn">Создать аккаунт &rarr;</button>
+            </form>
+        </div>
+    </div>
+
+    <main class="cabinet-section">
+
+        <!-- ЛЕВАЯ ПАНЕЛЬ -->
+        <aside class="sidebar">
+            <div class="glass-panel profile-card">
+                <div class="avatar">
+                    <img src="profile.png" alt="User Avatar" onerror="this.src='https://images.unsplash.com/photo-1568602471122-7832951cc4c5?q=80&w=2670&auto=format&fit=crop'">
+                    <div class="status-dot"></div>
+                </div>
+                <div class="user-name" id="user-display-name">.....</div>
+                <div class="user-role" id="user-display-role">Client</div>
+
+                <div class="sidebar-menu" style="margin-top: 20px;">
+                    <button class="sidebar-btn active">
+                        <svg viewBox="0 0 24 24"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg>
+                        Обзор
+                    </button>
+                    <button class="sidebar-btn">
+                        <svg viewBox="0 0 24 24"><path d="M20 6h-4V4c0-1.11-.89-2-2-2h-4c-1.11 0-2 .89-2 2v2H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zm-6 0h-4V4h4v2z"/></svg>
+                        Мои заказы
+                    </button>
+                    <button class="sidebar-btn">
+                        <svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+                        Избранное
+                    </button>
+                    <button class="sidebar-btn">
+                        <svg viewBox="0 0 24 24"><path d="M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.06-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61 l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.81c-0.04-0.24-0.24-0.41-0.48-0.41 h-3.84c-0.24,0-0.43,0.17-0.47,0.41L9.25,5.35C8.66,5.59,8.12,5.92,7.63,6.29L5.24,5.33c-0.22-0.08-0.47,0-0.59,0.22L2.73,8.87 C2.62,9.08,2.66,9.34,2.86,9.48l2.03,1.58C4.84,11.36,4.8,11.69,4.8,12s0.02,0.64,0.06,0.94l-2.03,1.58 c-0.18,0.14-0.23,0.41-0.12,0.61l1.92,3.32c0.12,0.22,0.37,0.29,0.59,0.22l2.39-0.96c0.5,0.38,1.03,0.7,1.62,0.94l0.36,2.54 C9.77,21.83,9.96,22,10.2,22h3.84c0.24,0,0.43-0.17,0.47-0.41l0.36-2.54c0.59-0.24,1.13-0.56,1.62-0.94l2.39,0.96 c0.22,0.08,0.47,0,0.59-0.22l1.92-3.32c0.12-0.22,0.07-0.49-0.12-0.61L19.14,12.94z M12,15.6c-1.98,0-3.6-1.62-3.6-3.6 s1.62-3.6,3.6-3.6s3.6,1.62,3.6,3.6S13.98,15.6,12,15.6z"/></svg>
+                        Настройки
+                    </button>
+                    <!-- КНОПКА ВЫХОДА -->
+                    <button class="sidebar-btn" onclick="logout()" style="color: #ff4757; margin-top: 10px;">
+                        <svg viewBox="0 0 24 24"><path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/></svg>
+                        Выйти
+                    </button>
+                </div>
+            </div>
+        </aside>
+
+        <!-- ПРАВАЯ ПАНЕЛЬ (ДАШБОРД) -->
+        <div class="dashboard">
+
+            <!-- Карточка 1: Текущая конфигурация ПК -->
+            <div class="bento-item glass-panel span-2">
+                <div class="bento-title" style="display: flex; justify-content: space-between;">
+                    <span>Конфигурация системы</span>
+                    <span id="scan-status" style="color: #00ff88; font-size: 0.8rem; font-weight: normal; animation: pulseIcon 1.5s infinite;">● Сканирование WebGL...</span>
+                </div>
+                <div class="system-specs" id="dynamic-specs">
+                    <div class="spec-row"><span class="spec-label">Операционная система</span><span class="spec-value" id="spec-os">_</span></div>
+                    <div class="spec-row"><span class="spec-label">Видеокарта (GPU)</span><span class="spec-value" id="spec-gpu">_</span></div>
+                    <div class="spec-row"><span class="spec-label">Процессор (Логич. ядра)</span><span class="spec-value" id="spec-cpu">_</span></div>
+                    <div class="spec-row"><span class="spec-label">ОЗУ (RAM)</span><span class="spec-value" id="spec-ram">_</span></div>
+
+                    <div class="spec-row"><span class="spec-label">Материнская плата</span><span class="spec-value" style="color: #ff4757; font-size: 0.9rem;">Доступ заблокирован браузером</span></div>
+                    <div class="spec-row" style="border: none;"><span class="spec-label">Накопитель (SSD/HDD)</span><span class="spec-value" style="color: #ff4757; font-size: 0.9rem;">Доступ заблокирован браузером</span></div>
+                </div>
+
+                <div style="display: flex; gap: 15px; margin-top: auto; align-items: center;">
+                    <button class="upgrade-btn">Апгрейд системы &rarr;</button>
+                    <button style="background: transparent; border: 1px solid rgba(255,255,255,0.2); color: rgba(255,255,255,0.7); padding: 12px 20px; border-radius: 20px; cursor: pointer; transition: 0.3s; font-size: 0.9rem;" onmouseover="this.style.color='#fff'; this.style.borderColor='rgba(255,255,255,0.5)'" onmouseout="this.style.color='rgba(255,255,255,0.7)'; this.style.borderColor='rgba(255,255,255,0.2)'">
+                        ⬇ Скачать PC Scanner .exe
+                    </button>
+                </div>
+            </div>
+
+            <!-- Карточка 2: Активный заказ -->
+            <div class="bento-item glass-panel span-row-2">
+                <div class="bento-title">Активный заказ</div>
+                <div class="order-status">
+                    <div class="order-icon">📦</div>
+                    <div class="order-name" id="order-display-name">Сборка #1 Guest Edition</div>
+                    <div class="order-desc" id="order-display-desc">Идет стресс-тестирование системы</div>
+
+                    <div class="progress-bar-bg">
+                        <div class="progress-bar-fill" id="order-display-progress" style="width: 50%;"></div>
+                    </div>
+                    <div class="progress-labels">
+                        <span>Сборка</span>
+                        <span style="color:#fff;">Тесты</span>
+                        <span>Доставка</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Карточка 3: Интерактивная статистика -->
+            <div class="bento-item glass-panel span-2">
+                <div class="bento-title">Мониторинг цен на комплектующие</div>
+                <div class="activity-chart">
+                    <div class="chart-bar"><div class="chart-fill" style="height: 40%"></div></div>
+                    <div class="chart-bar"><div class="chart-fill" style="height: 65%"></div></div>
+                    <div class="chart-bar"><div class="chart-fill" style="height: 30%"></div></div>
+                    <div class="chart-bar"><div class="chart-fill" style="height: 80%"></div></div>
+                    <div class="chart-bar"><div class="chart-fill" style="height: 55%"></div></div>
+                    <div class="chart-bar"><div class="chart-fill" style="height: 90%"></div></div>
+                    <div class="chart-bar"><div class="chart-fill" style="height: 45%"></div></div>
+                    <div class="chart-bar"><div class="chart-fill" style="height: 70%"></div></div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        // --- 1. ПЫЛИНКИ ---
+        const particlesContainer = document.getElementById('particles-container');
+        for (let i = 0; i < 120; i++) {
+            let p = document.createElement('div'); p.classList.add('particle');
+            p.style.width = p.style.height = `${Math.random() * 1.5 + 1}px`;
+            p.style.left = `${Math.random() * 100}%`; p.style.top = `${Math.random() * 100}%`;
+            p.style.animation = `drift ${Math.random() * 20 + 15}s linear ${Math.random() * 10}s infinite`;
+            particlesContainer.appendChild(p);
+        }
+
+        // --- 2. 3D НАКЛОН ---
+        const bentoCards = document.querySelectorAll('.bento-item, .profile-card');
+        bentoCards.forEach(card => {
+            card.addEventListener('mousemove', (e) => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                const centerX = rect.width / 2;
+                const centerY = rect.height / 2;
+                const rotateX = ((y - centerY) / centerY) * -5;
+                const rotateY = ((x - centerX) / centerX) * 5;
+                card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
+            });
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)`;
+            });
+        });
+
+        // ================= АВТОНОМНАЯ (MOCK) АВТОРИЗАЦИЯ =================
+        const authModal = document.getElementById('auth-modal');
+
+        function switchAuthTab(tab) {
+            const tabs = document.querySelectorAll('.auth-tab');
+            const loginForm = document.getElementById('login-form');
+            const registerForm = document.getElementById('register-form');
+
+            tabs.forEach(t => t.classList.remove('active'));
+            if (tab === 'login') {
+                tabs[0].classList.add('active');
+                loginForm.classList.remove('hidden');
+                registerForm.classList.add('hidden');
+            } else {
+                tabs[1].classList.add('active');
+                registerForm.classList.remove('hidden');
+                loginForm.classList.add('hidden');
+            }
+        }
+
+        // Логин (Проверка guest / guest)
+        function handleLogin(event) {
+            event.preventDefault();
+            const email = document.getElementById('login-email').value.trim();
+            const password = document.getElementById('login-password').value.trim();
+            const errorDiv = document.getElementById('login-error');
+            errorDiv.textContent = "";
+
+            if (email.toLowerCase().includes('guest') && password === 'guest') {
+                const fakeUser = {
+                    username: "Guest Tester",
+                    role: "Tester / VIP",
+                    orderName: "Сборка #1 Guest Edition",
+                    orderStatus: "Идет стресс-тестирование (Mock)",
+                    progress: 75
+                };
+                localStorage.setItem('mock_user', JSON.stringify(fakeUser));
+                authModal.classList.remove('active');
+                loadUserProfile();
+            } else {
+                errorDiv.textContent = "Неверные данные! Используйте логин и пароль: guest";
+            }
+        }
+
+        // Регистрация (Любые данные сохраняются в память браузера)
+        function handleRegister(event) {
+            event.preventDefault();
+            const username = document.getElementById('reg-username').value.trim();
+            const email = document.getElementById('reg-email').value.trim();
+            const errorDiv = document.getElementById('reg-error');
+            errorDiv.textContent = "";
+
+            const fakeUser = {
+                username: username || "Новый клиент",
+                role: "Client",
+                orderName: "Кастомная сборка #2026",
+                orderStatus: "Комплектация заказа",
+                progress: 30
+            };
+
+            localStorage.setItem('mock_user', JSON.stringify(fakeUser));
+            authModal.classList.remove('active');
+            loadUserProfile();
+        }
+
+        function logout() {
+            localStorage.removeItem('mock_user');
+            authModal.classList.add('active');
+            document.getElementById('user-display-name').textContent = ".....";
+        }
+
+        function loadUserProfile() {
+            const savedUser = localStorage.getItem('mock_user');
+            if (!savedUser) {
+                authModal.classList.add('active');
+                return;
+            }
+
+            try {
+                const user = JSON.parse(savedUser);
+                document.getElementById('user-display-name').textContent = user.username;
+                document.getElementById('user-display-role').textContent = user.role;
+                document.getElementById('order-display-name').textContent = user.orderName;
+                document.getElementById('order-display-desc').textContent = user.orderStatus;
+                document.getElementById('order-display-progress').style.width = `${user.progress}%`;
+            } catch (err) {
+                logout();
+            }
+        }
+
+        // ================= ЭФФЕКТ СКАНИРОВАНИЯ =================
+        document.addEventListener("DOMContentLoaded", () => {
+            loadUserProfile();
+
+            const osSpec = document.getElementById('spec-os');
+            const gpuSpec = document.getElementById('spec-gpu');
+            const cpuSpec = document.getElementById('spec-cpu');
+            const ramSpec = document.getElementById('spec-ram');
+            const scanStatus = document.getElementById('scan-status');
+
+            let osName = 'Неизвестная ОС';
+            const ua = window.navigator.userAgent;
+            if (ua.indexOf("Windows NT 10.0") !== -1) osName = "Windows 10 / 11";
+            else if (ua.indexOf("Windows NT 6.3") !== -1) osName = "Windows 8.1";
+            else if (ua.indexOf("Mac OS X") !== -1) osName = "macOS";
+            else if (ua.indexOf("Linux") !== -1) osName = "Linux";
+
+            let gpuName = 'Недоступно (Скрыто браузером)';
+            try {
+                const canvas = document.createElement('canvas');
+                const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+                if (gl) {
+                    const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
+                    if (debugInfo) {
+                        gpuName = gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL);
+                        gpuName = gpuName.replace('ANGLE (', '').split(' Direct3D')[0].split(' vs_')[0];
+                        if (gpuName.endsWith(')')) gpuName = gpuName.slice(0, -1);
+                    }
+                }
+            } catch (e) {}
+
+            const cpuCores = navigator.hardwareConcurrency ? `${navigator.hardwareConcurrency} потоков` : 'Скрыто';
+            const ramSize = navigator.deviceMemory ? `~ ${navigator.deviceMemory} GB` : 'Скрыто';
+
+            function typeWriterEffect(element, text, speed = 30) {
+                element.textContent = '';
+                let i = 0;
+                function type() {
+                    if (i < text.length) {
+                        element.textContent += text.charAt(i);
+                        i++;
+                        setTimeout(type, speed);
+                    }
+                }
+                type();
+            }
+
+            setTimeout(() => { typeWriterEffect(osSpec, osName); }, 800);
+            setTimeout(() => { typeWriterEffect(cpuSpec, cpuCores); }, 1400);
+            setTimeout(() => { typeWriterEffect(ramSpec, ramSize); }, 2000);
+            setTimeout(() => {
+                typeWriterEffect(gpuSpec, gpuName);
+                scanStatus.textContent = "✔ Синхронизировано (Mock)";
+                scanStatus.style.color = "rgba(255,255,255,0.4)";
+                scanStatus.style.animation = "none";
+            }, 2800);
+        });
+    </script>
+</body>
+</html><!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Кабинет - Monochrome Glass</title>
+    <style>
+        /* Общие сбросы */
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+
+        /* ВАЖНО: Фон и новый стандартный скроллбар (для Firefox) */
+        html {
+            background-color: #0a0b10;
+            background-image: radial-gradient(circle at top right, #1f2029 0%, #13141c 50%, #0a0b10 100%);
+            background-attachment: fixed;
+            scroll-behavior: smooth;
             scrollbar-color: #1f2029 #0a0b10; /* Ползунок и трек для Firefox */
             scrollbar-width: thin; /* Тонкий скролл */
         }
