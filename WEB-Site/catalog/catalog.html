@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Каталог - Monochrome Glass</title>
+    <!-- Подключаем стили для каталога -->
+    <link rel="stylesheet" href="catalog.css">
+</head>
+<body>
+
+    <!-- Фоны -->
+    <div class="ambient-background">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+        <div class="blob blob-4"></div>
+    </div>
+    <div id="particles-container"></div>
+
+    <!-- Навигация -->
+    <header class="navbar">
+        <nav class="navbar-menu">
+            <a href="../index.html">ГЛАВНОЕ</a>
+            <a href="../catalog/catalog.html" class="active">КАТАЛОГ</a>
+            <a href="../builds/builds.html">СБОРКИ</a>
+            <a href="../blog/blog.html">БЛОГ</a>
+            <a href="../contacts/contacts.html">КОНТАКТЫ</a>
+            <a href="../cabinet/cabinet.html">КАБИНЕТ</a>
+        </nav>
+    </header>
+
+    <!-- ОСНОВНАЯ СЕКЦИЯ: КАТАЛОГ -->
+    <section class="catalog-section">
+        <h1 class="catalog-title">Каталог</h1>
+
+        <!-- Контейнер для карточек -->
+        <div class="bento-grid" id="catalog-grid"></div>
+    </section>
+
+    <!-- ВСПЛЫВАЮЩЕЕ ОКНО (MODAL) -->
+    <div class="catalog-modal" id="modal">
+        <div class="close-modal" id="close-btn">&times;</div>
+        <div class="modal-content-wrapper">
+            <div class="modal-img-container">
+                <img src="" id="modal-img" class="modal-img">
+            </div>
+            <div class="modal-details">
+                <h2 id="modal-title">Название</h2>
+                <p id="modal-desc">Подробное описание товара...</p>
+                <div class="price" id="modal-price">$0</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Подключаем скрипты для каталога -->
+    <script src="catalog.js"></script>
+</body>
+</html>
