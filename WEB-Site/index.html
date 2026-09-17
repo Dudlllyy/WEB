@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monochrome Glass Portfolio</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div id="theme-intel" class="theme-layer"></div>
+    <div id="theme-ryzen" class="theme-layer"></div>
+
+    <div class="ambient-background">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+        <div class="blob blob-4"></div>
+        <div class="blob blob-5"></div>
+        <div class="blob blob-6"></div>
+    </div>
+    <div id="particles-container"></div>
+
+    <header class="navbar">
+        <nav class="navbar-menu glass-effect">
+            <a href="index.html" class="active">ГЛАВНОЕ</a>
+            <a href="catalog/catalog.html">КАТАЛОГ</a>
+            <a href="builds/builds.html">СБОРКИ</a>
+            <a href="blog/blog.html">БЛОГ</a>
+            <a href="contacts/contacts.html">КОНТАКТЫ</a>
+            <a href="cabinet/cabinet.html">КАБИНЕТ</a>
+        </nav>
+    </header>
+
+    <main class="main-container">
+        <section class="text-section glass-effect">
+            <h1>УНИКАЛЬНЫЙ<br>ОБЪЕКТ:<br>ОПИСАНИЕ</h1>
+            <p>Здесь подробное объяснение. Монохромный дизайн позволяет сосредоточить все внимание на контенте, а прозрачное стекло придает легкости.</p>
+        </section>
+        <section class="carousel-section" id="carousel">
+            <div class="card" data-title="ПРОЕКТ АЛЬФА" data-desc="Описание первого визуального проекта.">
+                <img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2564&auto=format&fit=crop" class="card-img" draggable="false">
+                <div class="glass-overlay"></div>
+            </div>
+            <div class="card" data-title="ПРОЕКТ БЕТА" data-desc="Убрали лишние цвета, оставив только свет и тени.">
+                <img src="https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=2670&auto=format&fit=crop" class="card-img" draggable="false">
+                <div class="glass-overlay"></div>
+            </div>
+            <div class="card" data-title="ПРОЕКТ ГАММА" data-desc="На фоне создают эффект реального пространства.">
+                <img src="https://images.unsplash.com/photo-1614850523459-c2f4c699c52e?q=80&w=2670&auto=format&fit=crop" class="card-img" draggable="false">
+                <div class="glass-overlay"></div>
+            </div>
+        </section>
+    </main>
+
+    <section class="content-section">
+        <div class="info-stack">
+            <div class="info-card gpu-card glass-effect active-card">
+                <h2>Видеокарта 1</h2><p>Флагманская модель с невероятной производительностью.</p><div class="price">$1,499</div>
+            </div>
+            <div class="info-card gpu-card glass-effect bg1-card">
+                <h2>Видеокарта 2</h2><p>Идеальный баланс цены и качества.</p><div class="price">$899</div>
+            </div>
+            <div class="info-card gpu-card glass-effect bg2-card">
+                <h2>Видеокарта 3</h2><p>Бюджетное решение для базовых задач.</p><div class="price">$399</div>
+            </div>
+        </div>
+        <div class="visual-container">
+            <div class="moon"></div>
+            <div class="slider-controls">
+                <button class="slider-btn" onclick="prevGpu()">&lt;</button>
+                <div class="item-image-wrapper"><img src="" class="item-image" id="gpu-img" draggable="false"></div>
+                <button class="slider-btn" onclick="nextGpu()">&gt;</button>
+            </div>
+        </div>
+    </section>
+
+    <section class="content-section" id="cpu-section">
+        <div class="info-stack">
+            <div class="info-card cpu-card glass-effect active-card" data-brand="intel">
+                <h2>Intel Core i9</h2><p>Максимальная тактовая частота и превосходная работа.</p><div class="price">$599</div>
+            </div>
+            <div class="info-card cpu-card glass-effect" data-brand="ryzen">
+                <h2>AMD Ryzen 9</h2><p>Многопоточный монстр для рендера и гейминга.</p><div class="price">$549</div>
+            </div>
+        </div>
+        <div class="visual-container">
+            <div class="moon"></div>
+            <div class="slider-controls">
+                <button class="slider-btn" onclick="prevCpu()">&lt;</button>
+                <div class="item-image-wrapper"><img src="" class="item-image" id="cpu-img" draggable="false"></div>
+                <button class="slider-btn" onclick="nextCpu()">&gt;</button>
+            </div>
+        </div>
+    </section>
+
+    <section class="ram-section">
+        <h2 class="ram-title">Оперативная память RAM</h2>
+
+        <div class="filter-container">
+            <div class="filter-row" id="ram-type-row">
+                <button class="filter-btn" data-type="DDR3">DDR3</button>
+                <button class="filter-btn" data-type="DDR4">DDR4</button>
+                <button class="filter-btn" data-type="DDR5">DDR5</button>
+            </div>
+            <div class="filter-row hidden-row" id="ram-size-row">
+                <button class="filter-btn" data-size="8gb">8gb</button>
+                <button class="filter-btn" data-size="16gb">16gb</button>
+                <button class="filter-btn" data-size="32gb">32gb</button>
+                <button class="filter-btn" data-size="64gb">64gb</button>
+            </div>
+        </div>
+
+        <div class="ram-results hidden-results" id="ram-results-board">
+            <div class="perfect-match-board glass-effect">
+                <h3 class="board-title">Идеально подошедшие по настройкам RAM</h3>
+                <div class="perfect-grid" id="perfect-grid"></div>
+            </div>
+
+            <div class="partial-match-board glass-effect">
+                <h3 class="board-title" style="text-align: center;">Что-то похожее</h3>
+                <div class="partial-slider" id="partial-slider"></div>
+            </div>
+        </div>
+    </section>
+
+    <div class="custom-tooltip" id="custom-tooltip">
+        <h4 id="tt-title">Название</h4>
+        <p id="tt-desc">Описание</p>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

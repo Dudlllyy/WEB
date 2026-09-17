@@ -1,0 +1,154 @@
+/* Общие сбросы */
+* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+
+/* ВАЖНО: Фон перенесен на html, чтобы он лежал в самом низу и не перекрывал слои */
+html {
+    background-color: #0a0b10;
+    background-image: radial-gradient(circle at top right, #1f2029 0%, #13141c 50%, #0a0b10 100%);
+    background-attachment: fixed;
+    scroll-behavior: smooth;
+    scrollbar-color: #1f2029 #0a0b10;
+    scrollbar-width: thin;
+}
+
+/* ТЕМНЫЙ СКРОЛЛБАР */
+::-webkit-scrollbar { width: 10px; height: 10px; background-color: #0a0b10; }
+::-webkit-scrollbar-track { background: #0a0b10; }
+::-webkit-scrollbar-thumb {
+    background: #1f2029;
+    border-radius: 5px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+::-webkit-scrollbar-thumb:hover { background: #2a2b36; }
+::-webkit-scrollbar-button { display: none; }
+
+img {
+    -webkit-user-drag: none; -khtml-user-drag: none; -moz-user-drag: none; -o-user-drag: none;
+    user-select: none; pointer-events: none;
+}
+
+body {
+    background-color: transparent; /* Теперь body прозрачный и не поглощает пылинки */
+    color: #ffffff; min-height: 100vh; overflow-x: hidden; overflow-y: auto;
+    display: flex; flex-direction: column; position: relative;
+    animation: pageFadeIn 1s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+@keyframes pageFadeIn { 0% { opacity: 0; } 100% { opacity: 1; } }
+
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.2); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.4); }
+
+/* ================= ПЛАВНОЕ ПОЯВЛЕНИЕ СТРАНИЦЫ ================= */
+.page-transition-overlay {
+    position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+    background-color: #0a0b10; z-index: 999999;
+    animation: fadeOutOverlay 1s cubic-bezier(0.25, 1, 0.5, 1) 0.2s forwards;
+    pointer-events: none;
+}
+@keyframes fadeOutOverlay { 0% { opacity: 1; } 100% { opacity: 0; visibility: hidden; } }
+
+/* --- ФОН И ПЫЛИНКИ --- */
+.ambient-background {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%; overflow: hidden;
+    z-index: -2; filter: blur(100px); -webkit-filter: blur(100px); transform: translateZ(0); pointer-events: none;
+}
+.blob { position: absolute; border-radius: 50%; animation: float 25s infinite ease-in-out alternate; background: rgba(255, 255, 255, 0.05); }
+
+/* Раскидываем пятна на всю длину */
+.blob-1 { width: 50vw; height: 50vw; top: 0%; left: -10%; animation-duration: 30s; }
+.blob-2 { width: 45vw; height: 45vw; top: 30%; right: -10%; animation-duration: 35s; animation-delay: -5s; }
+.blob-3 { width: 40vw; height: 40vw; top: 60%; left: 30%; animation-duration: 28s; animation-delay: -10s; }
+.blob-4 { width: 55vw; height: 55vw; top: 85%; right: 10%; animation-duration: 32s; animation-delay: -2s; }
+.blob-5 { width: 45vw; height: 45vw; top: 10%; left: 60%; animation-duration: 25s; animation-delay: -7s; }
+.blob-6 { width: 60vw; height: 60vw; top: 70%; left: -10%; animation-duration: 34s; animation-delay: -3s; }
+
+@keyframes float { 0% { transform: translate3d(0, 0, 0) scale(1); } 50% { transform: translate3d(3vw, 5vh, 0) scale(1.05); } 100% { transform: translate3d(-5vw, -8vh, 0) scale(0.95); } }
+
+#particles-container {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    z-index: -1; pointer-events: none; overflow: hidden;
+}
+.particle { position: absolute; background: rgba(255, 255, 255, 0.8); border-radius: 50%; will-change: transform, opacity; }
+@keyframes drift { 0% { transform: translate3d(0, 0, 0); opacity: 0; } 20% { opacity: 0.3; } 80% { opacity: 0.3; } 100% { transform: translate3d(5vw, -20vh, 0); opacity: 0; } }
+
+/* НАВИГАЦИЯ */
+.navbar { display: flex; justify-content: center; padding: 20px 0; z-index: 100; position: fixed; width: 100%; opacity: 0; animation: navFadeDown 1s cubic-bezier(0.25, 1, 0.5, 1) 0.5s forwards; }
+@keyframes navFadeDown { 0% { opacity: 0; transform: translateY(-30px); } 100% { opacity: 1; transform: translateY(0); } }
+.navbar-menu {
+    display: flex; gap: 30px; padding: 15px 40px; border-radius: 30px;
+    background: rgba(255, 255, 255, 0.02); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
+    border: 1px solid rgba(255, 255, 255, 0.05); border-top: 1px solid rgba(255, 255, 255, 0.2); border-left: 1px solid rgba(255, 255, 255, 0.15);
+    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5);
+}
+.navbar-menu a { text-decoration: none; color: rgba(255, 255, 255, 0.6); font-size: 13px; font-weight: 600; letter-spacing: 1px; transition: color 0.3s; }
+.navbar-menu a:hover { color: #ffffff; }
+.navbar-menu a.active { color: #ffffff; border-bottom: 2px solid #fff; padding-bottom: 2px; }
+
+/* ================= БЛОГ СЕКЦИЯ ================= */
+.blog-section {
+    width: 100%; padding: 140px 100px 80px; max-width: 1600px; margin: 0 auto; position: relative; z-index: 10;
+}
+
+.blog-header {
+    text-align: center; border-bottom: 1px solid rgba(255, 255, 255, 0.1); padding-bottom: 30px; margin-bottom: 40px;
+    opacity: 0; transform: translateY(30px);
+    animation: contentFadeUp 1s cubic-bezier(0.25, 1, 0.5, 1) 0.6s forwards;
+}
+@keyframes contentFadeUp { to { opacity: 1; transform: translateY(0); } }
+
+.blog-header h1 { font-size: 3rem; font-weight: bold; color: #fff; margin-bottom: 15px; }
+.blog-header p { font-size: 1.1rem; color: rgba(255, 255, 255, 0.6); }
+
+/* СЕТКА БЛОГА */
+.blog-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; justify-content: center;
+}
+
+/* КАРТОЧКА БЛОГА */
+.blog-card {
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.03) 0%, rgba(255, 255, 255, 0.01) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.08); border-top: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 20px; display: flex; flex-direction: column;
+    cursor: pointer; position: relative; overflow: hidden; backdrop-filter: blur(15px);
+    opacity: 0; transform: translateY(40px);
+    transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease, border-color 0.3s ease, background 0.3s ease;
+}
+
+.blog-card.is-visible { opacity: 1; transform: translateY(0); }
+
+.blog-card.is-visible:hover {
+    transform: translateY(-8px); background: linear-gradient(180deg, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0.02) 100%);
+    border-color: rgba(255, 255, 255, 0.2); box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
+}
+
+.card-img-wrapper {
+    width: 100%; height: 220px; overflow: hidden; position: relative;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.card-img-wrapper img {
+    width: 100%; height: 100%; object-fit: cover;
+    transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.blog-card.is-visible:hover .card-img-wrapper img { transform: scale(1.08); }
+
+.card-content { padding: 25px; display: flex; flex-direction: column; flex: 1; }
+
+.card-title {
+    color: #fff; font-size: 1.3rem; font-weight: 700; margin-bottom: 15px; line-height: 1.3;
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+
+.card-desc {
+    color: rgba(255, 255, 255, 0.6); font-size: 0.95rem; line-height: 1.5; margin-bottom: 25px;
+    display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
+}
+
+/* Футер карточки */
+.card-meta {
+    margin-top: auto; display: flex; justify-content: flex-end; align-items: center;
+    color: rgba(255, 255, 255, 0.4); font-size: 0.85rem; font-weight: 600;
+}
